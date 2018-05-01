@@ -67,32 +67,31 @@ namespace DSN {
             try {
                 while (true) {
                     string input = Console.ReadLine();
-                    if (input != null) {
-                        string[] tokens = input.Split('|');
-                        string command = tokens[0];
-                        if (command.Equals("START_DIALOGUE")) {
-                            lock (dialogueLock) {
-                                currentDialogue = DialogueList.Parse(string.Join("|", tokens, 1, tokens.Length - 1));
-                            }
-                            //currentDialogue.PrintToTrace();
-                            // Switch to dialogue mode
-                            recognizer.StartSpeechRecognition(true, currentDialogue);
-                        } else if (command.Equals("STOP_DIALOGUE")) {
-                            // Switch to command mode
-                            recognizer.StartSpeechRecognition(false, Configuration.GetConsoleCommandList(), favoritesList);
-                            lock (dialogueLock) {
-                                currentDialogue = null;
-                            }
-                        } else if (command.Equals("FAVORITES")) {
-                            favoritesList.Update(string.Join("|", tokens, 1, tokens.Length - 1));
-                            if(currentDialogue == null) {
-                                recognizer.StartSpeechRecognition(false, Configuration.GetConsoleCommandList(), favoritesList);
-                            }
-                        }
-                    } else {
-                        break;
-                    }
 
+                    // input will be null when Skyrim is closed
+                    if (input == null)
+                        break;
+
+                    string[] tokens = input.Split('|');
+                    string command = tokens[0];
+                    if (command.Equals("START_DIALOGUE")) {
+                        lock (dialogueLock) {
+                            currentDialogue = DialogueList.Parse(string.Join("|", tokens, 1, tokens.Length - 1));
+                        }
+                        // Switch to dialogue mode
+                        recognizer.StartSpeechRecognition(true, currentDialogue);
+                    } else if (command.Equals("STOP_DIALOGUE")) {
+                        // Switch to command mode
+                        recognizer.StartSpeechRecognition(false, Configuration.GetConsoleCommandList(), favoritesList);
+                        lock (dialogueLock) {
+                            currentDialogue = null;
+                        }
+                    } else if (command.Equals("FAVORITES")) {
+                        favoritesList.Update(string.Join("|", tokens, 1, tokens.Length - 1));
+                        if(currentDialogue == null) {
+                            recognizer.StartSpeechRecognition(false, Configuration.GetConsoleCommandList(), favoritesList);
+                        }
+                    }
                 }
             } catch (Exception ex) {
                 Trace.TraceError(ex.ToString());

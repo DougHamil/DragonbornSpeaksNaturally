@@ -30,16 +30,25 @@ namespace DSN {
                 string line = lines[i];
                 if (line == null || line.Trim() == "")
                     continue;
-                Grammar g = new Grammar(new GrammarBuilder(line, matchingMode));
-                grammarToIndex[g] = i;
+                try {
+                    Grammar g = new Grammar(new GrammarBuilder(line, matchingMode));
+                    grammarToIndex[g] = i;
+                }
+                catch(Exception ex) {
+                    Trace.TraceError("Failed to create grammar for line {0} due to exception:\n{1}", line, ex.ToString());
+                }
             }
 
             foreach(string phrase in goodbyePhrases) {
                 if (phrase == null || phrase.Trim() == "")
                     continue;
                 Trace.TraceInformation("Found goodbye phrase: '{0}'", phrase);
-                Grammar g = new Grammar(new GrammarBuilder(phrase, matchingMode));
-                grammarToIndex[g] = -2;
+                try {
+                    Grammar g = new Grammar(new GrammarBuilder(phrase, matchingMode));
+                    grammarToIndex[g] = -2;
+                } catch (Exception ex) {
+                    Trace.TraceError("Failed to create grammar for exit dialogue phrase {0} due to exception:\n{1}", phrase, ex.ToString());
+                }
             }
         }
 

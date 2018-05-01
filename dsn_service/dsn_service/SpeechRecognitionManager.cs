@@ -18,8 +18,8 @@ namespace DSN {
 
         public SpeechRecognitionManager() {
             string locale = Configuration.Get("SpeechRecognition", "Locale", CultureInfo.InstalledUICulture.Name);
-            dialogueMinimumConfidence = float.Parse(Configuration.Get("SpeechRecognition", "dialogueMinConfidence", "0.5"));
-            commandMinimumConfidence = float.Parse(Configuration.Get("SpeechRecognition", "commandMinConfidence", "0.7"));
+            dialogueMinimumConfidence = float.Parse(Configuration.Get("SpeechRecognition", "dialogueMinConfidence", "0.5"), CultureInfo.InvariantCulture);
+            commandMinimumConfidence = float.Parse(Configuration.Get("SpeechRecognition", "commandMinConfidence", "0.7"), CultureInfo.InvariantCulture);
 
             Trace.TraceInformation("Locale: {0}\nDialogueConfidence: {1}\nCommandConfidence: {2}", locale, dialogueMinimumConfidence, commandMinimumConfidence);
 
@@ -71,11 +71,13 @@ namespace DSN {
         }
 
         private void DSN_SpeechRecognized(object sender, SpeechRecognizedEventArgs e) {
-            Trace.TraceInformation("Recognized line '{0}' (Confidence: {1})", e.Result.Text, e.Result.Confidence);
-
             float minConfidence = isDialogueMode ? dialogueMinimumConfidence : commandMinimumConfidence;
-            if (e.Result.Confidence >= minConfidence)
+            if (e.Result.Confidence >= minConfidence) {
+                Trace.TraceInformation("Recognized phrase '{0}' (Confidence: {1})", e.Result.Text, e.Result.Confidence);
                 OnDialogueLineRecognized?.Invoke(e.Result);
+            } else {
+                Trace.TraceInformation("Recognized phrase '{0}' but ignored because confidence was too low (Confidence: {1})", e.Result.Text, e.Result.Confidence);
+            }
         }
     }
 }

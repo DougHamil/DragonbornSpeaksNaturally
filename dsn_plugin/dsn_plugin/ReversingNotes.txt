@@ -1,0 +1,13 @@
+Hook Entry:
+1. Search for "call" make jump 2 lines below
+
+Hook Loop:
+1. Search for "CurrentTime" (Should be FIRST entry)
+2. Make jump in the line below
+
+MenuManager Singleton Address:
+1. Search for  "Book Menu"
+2. See mov above, it points to MenuManager * singleton address
+00007FF616169590 | 48 89 05 89 C5 E3 01     | mov qword ptr ds:[<MenuManager>],rax    |
+00007FF616169597 | 4C 8D 05 D2 08 7B 00     | lea r8,qword ptr ds:[7FF616919E70]      |
+00007FF61616959E | 48 8D 15 9B 04 D7 01     | lea rdx,qword ptr ds:[7FF617ED9A40]     | rdx:&"MapMenu", 00007FF617ED9A40:"Book Menu"

@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace DSN {
     class Program {
-        private static readonly string VERSION = "0.13";
+        private static readonly string VERSION = "0.14";
 
         static void Main(string[] args) {
             try {

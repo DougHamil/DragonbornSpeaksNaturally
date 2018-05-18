@@ -67,6 +67,7 @@ namespace DSN {
             try {
                 while (true) {
                     string input = Console.ReadLine();
+                    Trace.TraceInformation("Received command: {0}", input);
 
                     // input will be null when Skyrim is closed
                     if (input == null)

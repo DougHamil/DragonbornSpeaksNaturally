@@ -197,8 +197,9 @@ static DWORD WINAPI SpeechRecognitionClientThreadStart(void* ctx) {
 	//siStartInfo.hStdError = g_hChildStd_OUT_Wr;
 	siStartInfo.hStdOutput = g_hChildStd_OUT_Wr;
 	siStartInfo.hStdInput = g_hChildStd_IN_Rd;
-	siStartInfo.wShowWindow = SW_SHOWMINNOACTIVE;
+	siStartInfo.wShowWindow = SW_HIDE;
 	siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+	siStartInfo.dwFlags |= STARTF_USESHOWWINDOW;
 
 	bSuccess = CreateProcess(NULL,
 		szCmdline,     // command line 

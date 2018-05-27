@@ -16,6 +16,7 @@ namespace DSN {
             if(sectionData != null) {
                 foreach(KeyData key in sectionData) {
                     Grammar grammar = new Grammar(new GrammarBuilder(key.KeyName));
+                    grammar.Name = key.KeyName;
                     list.commandsByPhrase[grammar] = key.Value.Trim();
                 }
             }
@@ -33,7 +34,7 @@ namespace DSN {
         public void PrintToTrace() {
             Trace.TraceInformation("Command List Phrases:");
             foreach (KeyValuePair<Grammar, string> entry in commandsByPhrase) {
-                Trace.TraceInformation("Phrase '{0}' mapped to commands '{1}'", entry.Key, entry.Value);
+                Trace.TraceInformation("Phrase '{0}' mapped to commands '{1}'", entry.Key.Name, entry.Value);
             }
         }
 

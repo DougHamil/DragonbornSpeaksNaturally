@@ -48,6 +48,7 @@ namespace DSN {
                     }
 
                     Grammar grammar = new Grammar(grammarBuilder);
+                    grammar.Name = phrase;
                     commandsByGrammar[grammar] = command;
                 } catch(Exception ex) {
                     Trace.TraceError("Failed to parse {0} due to exception:\n{1}", itemStr, ex.ToString());
@@ -60,7 +61,7 @@ namespace DSN {
         public void PrintToTrace() {
             Trace.TraceInformation("Favorites List Phrases:");
             foreach (KeyValuePair<Grammar, string> entry in commandsByGrammar) {
-                Trace.TraceInformation("Phrase '{0}' mapped to equip command '{1}'", entry.Key, entry.Value);
+                Trace.TraceInformation("Phrase '{0}' mapped to equip command '{1}'", entry.Key.Name, entry.Value);
             }
         }
 

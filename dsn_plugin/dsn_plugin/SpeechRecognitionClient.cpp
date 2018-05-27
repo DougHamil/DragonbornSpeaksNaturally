@@ -180,7 +180,11 @@ static DWORD WINAPI SpeechRecognitionClientThreadStart(void* ctx) {
 	CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0);
 	SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0);
 
-	std::string exePath = g_dllPath.substr(0, g_dllPath.find_last_of("\\/")).append("\\DragonbornSpeaksNaturally.exe");
+	std::string exePath = g_dllPath.substr(0, g_dllPath.find_last_of("\\/"))
+		.append("\\DragonbornSpeaksNaturally.exe")
+		.append(" --encoding UTF-8"); // Let the service set encoding of its stdin/stdout to UTF-8.
+                                    // This can avoid non-ASCII characters (such as Chinese characters) garbled.
+	
 	Log::info("Starting speech recognition service at ");
 	Log::info(exePath);
 
@@ -195,8 +199,9 @@ static DWORD WINAPI SpeechRecognitionClientThreadStart(void* ctx) {
 	//siStartInfo.hStdError = g_hChildStd_OUT_Wr;
 	siStartInfo.hStdOutput = g_hChildStd_OUT_Wr;
 	siStartInfo.hStdInput = g_hChildStd_IN_Rd;
-	siStartInfo.wShowWindow = SW_SHOWMINNOACTIVE;
+	siStartInfo.wShowWindow = SW_HIDE;
 	siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+	siStartInfo.dwFlags |= STARTF_USESHOWWINDOW;
 
 	bSuccess = CreateProcess(NULL,
 		szCmdline,     // command line 

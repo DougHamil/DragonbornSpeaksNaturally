@@ -21,8 +21,8 @@ public:
 	virtual GImageInfoBase*	LoadImage(const char * url);
 
 	MEMBER_FN_PREFIX(BSScaleformImageLoader);
-	DEFINE_MEMBER_FN(AddVirtualImage, UInt8, 0x00F9EB10, NiTexture ** texture);
-	DEFINE_MEMBER_FN(ReleaseVirtualImage, UInt8, 0x00F9EFE0, NiTexture ** texture);
+	DEFINE_MEMBER_FN(AddVirtualImage, UInt8, 0x00FA2050, NiTexture ** texture);
+	DEFINE_MEMBER_FN(ReleaseVirtualImage, UInt8, 0x00FA2520, NiTexture ** texture);
 };
 
 class GFxLoader
@@ -39,10 +39,10 @@ public:
 
 
 	MEMBER_FN_PREFIX(GFxLoader);
-	DEFINE_MEMBER_FN(ctor, GFxLoader *, 0x00F27850);
+	DEFINE_MEMBER_FN(ctor, GFxLoader *, 0x00F2ADC0);
 
 	// Note: Probably in subclass
-	DEFINE_MEMBER_FN(LoadMovie, bool, 0x00F27F10, IMenu* menu, GFxMovieView** viewOut, const char* name, int arg4, float arg5);
+	DEFINE_MEMBER_FN(LoadMovie, bool, 0x00F2B480, IMenu* menu, GFxMovieView** viewOut, const char* name, int arg4, float arg5);
 
 	static UInt64* getCtorHookAddress();
 

@@ -59,10 +59,11 @@ public:
 	Entry	items;	// 118
 
 	MEMBER_FN_PREFIX(SettingCollectionList);
-	DEFINE_MEMBER_FN(Get_Internal, Setting *, 0x00321700, const char * name);
+	DEFINE_MEMBER_FN(Get_Internal, Setting *, 0x003219E0, const char * name);
 
 	Setting	*	Get(const char * name);
 };
+STATIC_ASSERT(offsetof(SettingCollectionList, items) == 0x118);
 
 // 138
 class SettingCollectionMap
@@ -76,6 +77,7 @@ public:
 	UInt64	pad008[(0x118 - 0x008) >> 3];
 	NiTMap <char const *, Setting *>	items;	// 118 - actually BSTCaseInsensitiveStringMap but that only changes the virtual functions
 };
+STATIC_ASSERT(offsetof(SettingCollectionMap, items) == 0x118);
 
 Setting * GetINISetting(const char * name);
 

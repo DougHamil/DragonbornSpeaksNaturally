@@ -69,7 +69,7 @@ public:
 	};
 
 	MEMBER_FN_PREFIX(BSFaceGenNiNode);
-	DEFINE_MEMBER_FN(AdjustHeadMorph, void, 0x003E87A0, UInt32 unk04, UInt32 unk08, float delta);
+	DEFINE_MEMBER_FN(AdjustHeadMorph, void, 0x003E8A50, UInt32 unk04, UInt32 unk08, float delta);
 };
 
 //STATIC_ASSERT(sizeof(BSFaceGenNiNode) == 0xEC);

@@ -96,10 +96,10 @@ public:
 		const char	* data;
 
 		MEMBER_FN_PREFIX(Ref);
-		DEFINE_MEMBER_FN(ctor, Ref *, 0x00C6A540, const char * buf);
-		DEFINE_MEMBER_FN(Set, Ref *, 0x00C6A6B0, const char * buf);
+		DEFINE_MEMBER_FN(ctor, Ref *, 0x00C6DB20, const char * buf);
+		DEFINE_MEMBER_FN(Set, Ref *, 0x00C6DC90, const char * buf);
 		// 77D2390F6DC57138CF0E5266EB5BBB0ACABDFBE3+A0
-		DEFINE_MEMBER_FN(Release, void, 0x00C6A690);
+		DEFINE_MEMBER_FN(Release, void, 0x00C6DC70);
 
 		Ref();
 		Ref(const char * buf);
@@ -878,7 +878,6 @@ template <typename Item, typename Key = Item>
 class tHashSet
 {
 public:
-
 	class _Entry
 	{
 	public:
@@ -896,6 +895,7 @@ public:
 			_MESSAGE("\t\tnext: %08X", next);
 		}
 	};
+public:
 	// When creating a new tHashSet, init sentinel pointer with address of this entry
 	static _Entry sentinel;
 
@@ -907,6 +907,7 @@ public:
 	_Entry 		* m_eolPtr;		// 018
 	UInt64		unk_018;		// 020
 	_Entry		* m_entries;	// 028
+
 
 	_Entry * GetEntry(UInt32 hash) const
 	{

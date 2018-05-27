@@ -19,9 +19,9 @@ public:
 
 	MEMBER_FN_PREFIX(VMArgList);
 	// 20AE20213D7A9C7AB3491192BCCB2467282AE266+44
-	DEFINE_MEMBER_FN(GetOffset, UInt32, 0x01296E20, VMState * state);
+	DEFINE_MEMBER_FN(GetOffset, UInt32, 0x0129A6C0, VMState * state);
 	// 20AE20213D7A9C7AB3491192BCCB2467282AE266+62
-	DEFINE_MEMBER_FN(Get, VMValue *, 0x01296E80, VMState * state, UInt32 idx, UInt32 offset);
+	DEFINE_MEMBER_FN(Get, VMValue *, 0x0129A720, VMState * state, UInt32 idx, UInt32 offset);
 };
 
 template <typename T>

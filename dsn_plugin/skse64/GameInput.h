@@ -296,8 +296,10 @@ public:
 	// used by Hooks_Event
 	PlayerControls * ctor_Hook(void);
 	MEMBER_FN_PREFIX(PlayerControls);
-	DEFINE_MEMBER_FN(ctor, PlayerControls *, 0x00729F30);
+	DEFINE_MEMBER_FN(ctor, PlayerControls *, 0x0072B900);
 };
+STATIC_ASSERT(offsetof(PlayerControls, runMode) == 0x049);
+STATIC_ASSERT(offsetof(PlayerControls, remapMode) == 0x050);
 
 // 90
 class MenuControls
@@ -328,6 +330,7 @@ public:
 
 	static MenuControls *	GetSingleton(void);
 };
+STATIC_ASSERT(offsetof(MenuControls, remapMode) == 0x082);
 
 // 340
 class InputStringHolder
@@ -441,7 +444,7 @@ public:
 	static InputStringHolder *	GetSingleton(void)
 	{
 		// F1F9E171ECCBA02B07850342C5C84CAE531026C7+D0
-		static RelocPtr<InputStringHolder*> g_inputStringHolder(0x02FE5030);
+		static RelocPtr<InputStringHolder*> g_inputStringHolder(0x02FEA140);
 		return *g_inputStringHolder;
 	}
 };

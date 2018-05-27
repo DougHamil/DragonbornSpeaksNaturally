@@ -204,9 +204,9 @@ public:
 
 	// This function seems to fix weird lighting issues when creating armors internally
 	// Not particularly sure what it does but it seems to mess around with a lot material flags
-	DEFINE_MEMBER_FN(InitializeShader, UInt32, 0x01300050, BSGeometry * geometry);
-	DEFINE_MEMBER_FN(SetMaterial, UInt32, 0x012C6DB0, BSLightingShaderMaterial * material, bool unk1); // unk1 usually 1
-	DEFINE_MEMBER_FN(SetFlags, UInt64, 0x012C6CA0, UInt8 unk1, UInt8 unk2);
-	DEFINE_MEMBER_FN(InvalidateMaterial, bool, 0x001ABF50);
-	DEFINE_MEMBER_FN(InvalidateTextures, void, 0x01300430, UInt32 unk1); // unk1 usually 0, called after material Releases textures
+	DEFINE_MEMBER_FN(InitializeShader, UInt32, 0x01303AC0, BSGeometry * geometry);
+	DEFINE_MEMBER_FN(SetMaterial, UInt32, 0x012CA650, BSLightingShaderMaterial * material, bool unk1); // unk1 usually 1
+	DEFINE_MEMBER_FN(SetFlags, UInt64, 0x012CA540, UInt8 unk1, UInt8 unk2);
+	DEFINE_MEMBER_FN(InvalidateMaterial, bool, 0x001AC0E0);
+	DEFINE_MEMBER_FN(InvalidateTextures, void, 0x01303EA0, UInt32 unk1); // unk1 usually 0, called after material Releases textures
 };

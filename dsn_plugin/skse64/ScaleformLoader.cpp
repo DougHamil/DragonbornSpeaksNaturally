@@ -25,12 +25,12 @@ GFxLoader *GFxLoader::ctor_Hook(void)
 GFxLoader * GFxLoader::GetSingleton()
 {
 	// 288124718F8102AA5D2B09022062AF83F3795442+AE
-	RelocPtr<GFxLoader*> g_GFxLoader(0x02FE5408);
+	RelocPtr<GFxLoader*> g_GFxLoader(0x02FEA518);
 	return *g_GFxLoader;	
 }
 
 UInt64* GFxLoader::getCtorHookAddress()
 {
-	RelocPtr<UInt64> ctorHookAddress(0x005B5670 + 0xACE);
+	RelocPtr<UInt64> ctorHookAddress(0x005B5880 + 0xACE);
 	return ctorHookAddress;
 }

@@ -118,7 +118,7 @@ public:
 	void SetTextureSet(BSTextureSet * textureSet);
 
 	MEMBER_FN_PREFIX(BSLightingShaderMaterial);
-	DEFINE_MEMBER_FN(CopyFrom, void, 0x0130A3E0, BSLightingShaderMaterial * other);
+	DEFINE_MEMBER_FN(CopyFrom, void, 0x0130DE50, BSLightingShaderMaterial * other);
 };
 STATIC_ASSERT(sizeof(BSLightingShaderMaterial) == 0xA0);
 

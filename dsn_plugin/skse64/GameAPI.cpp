@@ -1,19 +1,19 @@
 #include "skse64/GameAPI.h"
 
 // 4371A3D33EB5D62C7C548EBD5F760AF15A9B0B96+41
-RelocPtr <Heap> g_mainHeap(0x01F7C800);
+RelocPtr <Heap> g_mainHeap(0x01F81900);
 
 // 75643FD50A96D1F83B1AC4797EC84EF1C53039AC+68
-RelocPtr <ConsoleManager *> g_console(0x02FBFED0);
+RelocPtr <ConsoleManager *> g_console(0x02FC4FE0);
 
 // E1E59B64FDA5B8A9085AE9314353ABEEA0DB2823+C4
-RelocPtr <UInt32> g_consoleHandle(0x0300C4BC);
+RelocPtr <UInt32> g_consoleHandle(0x030115FC);
 
 // 52DD97B7C619EA732D3CD95637F449FC7A23DD12+24
-RelocPtr<UInt32> g_TlsIndexPtr(0x036EDE18);
+RelocPtr<UInt32> g_TlsIndexPtr(0x036F2F58);
 
 // BC8BF08A45C960EB35F2BAFEC9432C80365A1473+14A
-RelocPtr<PlayerCharacter*> g_thePlayer(0x02FE68D0);
+RelocPtr<PlayerCharacter*> g_thePlayer(0x02FEB9F0);
 
 void * Heap_Allocate(size_t size)
 {

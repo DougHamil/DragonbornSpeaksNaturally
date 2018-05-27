@@ -256,12 +256,12 @@ public:
 	UInt32 CreateRefHandle(void);
 
 	MEMBER_FN_PREFIX(TESObjectREFR);
-	DEFINE_MEMBER_FN(GetBaseScale, float, 0x0029E0E0);
-	DEFINE_MEMBER_FN(IsOffLimits, bool, 0x002AB790);
+	DEFINE_MEMBER_FN(GetBaseScale, float, 0x0029E390);
+	DEFINE_MEMBER_FN(IsOffLimits, bool, 0x002ABA40);
 	// E2B825B476DC5CFBC69E194AA76CB0C049AC78E3+137
-	DEFINE_MEMBER_FN(GetWeight, float, 0x002B84B0);
-	DEFINE_MEMBER_FN(GetReferenceName, const char *, 0x002A7640);
-	DEFINE_MEMBER_FN(GetWorldspace, TESWorldSpace*, 0x002AABA0);
+	DEFINE_MEMBER_FN(GetWeight, float, 0x002B8760);
+	DEFINE_MEMBER_FN(GetReferenceName, const char *, 0x002A78F0);
+	DEFINE_MEMBER_FN(GetWorldspace, TESWorldSpace*, 0x002AAE50);
 };
 
 STATIC_ASSERT(sizeof(TESObjectREFR) == 0x98);
@@ -547,14 +547,14 @@ public:
 	UInt64	unk2A8;									// 2A8
 
 	MEMBER_FN_PREFIX(Actor);
-	DEFINE_MEMBER_FN(QueueNiNodeUpdate, void, 0x0069C550, bool updateWeight);
-	DEFINE_MEMBER_FN(HasPerk, bool, 0x00602470, BGSPerk * perk);
-	DEFINE_MEMBER_FN(GetLevel, UInt16, 0x005DE7F0);
-	DEFINE_MEMBER_FN(SetRace, void, 0x0060FEC0, TESRace*, bool isPlayer);
-	DEFINE_MEMBER_FN(UpdateWeaponAbility, void, 0x0063A100, TESForm*, BaseExtraList * extraData, bool bLeftHand);
-	DEFINE_MEMBER_FN(UpdateArmorAbility, void, 0x0063A090, TESForm*, BaseExtraList * extraData);
-	DEFINE_MEMBER_FN(IsHostileToActor, bool, 0x005F0430, Actor * actor);
-	DEFINE_MEMBER_FN(ResetAI, void, 0x005E3870, UInt32 unk1, UInt32 unk2);
+	DEFINE_MEMBER_FN(QueueNiNodeUpdate, void, 0x0069C710, bool updateWeight);
+	DEFINE_MEMBER_FN(HasPerk, bool, 0x006025A0, BGSPerk * perk);
+	DEFINE_MEMBER_FN(GetLevel, UInt16, 0x005DE910);
+	DEFINE_MEMBER_FN(SetRace, void, 0x00610000, TESRace*, bool isPlayer);
+	DEFINE_MEMBER_FN(UpdateWeaponAbility, void, 0x0063A2A0, TESForm*, BaseExtraList * extraData, bool bLeftHand);
+	DEFINE_MEMBER_FN(UpdateArmorAbility, void, 0x0063A230, TESForm*, BaseExtraList * extraData);
+	DEFINE_MEMBER_FN(IsHostileToActor, bool, 0x005F0560, Actor * actor);
+	DEFINE_MEMBER_FN(ResetAI, void, 0x005E3990, UInt32 unk1, UInt32 unk2);
 
 	TESForm * GetEquippedObject(bool abLeftHand);
 	void UpdateSkinColor();
@@ -894,10 +894,10 @@ public:
 	}
 
 	MEMBER_FN_PREFIX(PlayerCharacter);
-	DEFINE_MEMBER_FN(GetNumTints, UInt32, 0x006D75C0, UInt32 tintType);
-	DEFINE_MEMBER_FN(GetTintMask, TintMask *, 0x006D7410, UInt32 tintType, UInt32 index);
-	DEFINE_MEMBER_FN(GetDamage, float, 0x0069C490, InventoryEntryData * pForm);
-	DEFINE_MEMBER_FN(GetArmorValue, float, 0x0069C110, InventoryEntryData * pForm);
+	DEFINE_MEMBER_FN(GetNumTints, UInt32, 0x006D8730, UInt32 tintType);
+	DEFINE_MEMBER_FN(GetTintMask, TintMask *, 0x006D8580, UInt32 tintType, UInt32 index);
+	DEFINE_MEMBER_FN(GetDamage, float, 0x0069C650, InventoryEntryData * pForm);
+	DEFINE_MEMBER_FN(GetArmorValue, float, 0x0069C2D0, InventoryEntryData * pForm);
 };
 
 STATIC_ASSERT(offsetof(PlayerCharacter, userEventEnabledEvent) == 0x2C0);

@@ -306,8 +306,8 @@ public:
 	NiSkinInstance * Clone(bool reuse = true);
 
 	MEMBER_FN_PREFIX(NiSkinInstance);
-	DEFINE_MEMBER_FN(Copy, NiSkinInstance*, 0x00C94230);
-	DEFINE_MEMBER_FN(ctor, NiSkinInstance *, 0x00CC1C10);
+	DEFINE_MEMBER_FN(Copy, NiSkinInstance*, 0x00C97810);
+	DEFINE_MEMBER_FN(ctor, NiSkinInstance *, 0x00CC5250);
 };
 //STATIC_ASSERT(sizeof(NiSkinInstance) == 0x38);
 
@@ -324,6 +324,6 @@ public:
 	static BSDismemberSkinInstance * Create();
 
 	MEMBER_FN_PREFIX(BSDismemberSkinInstance);
-	DEFINE_MEMBER_FN(ctor, BSDismemberSkinInstance *, 0x00CAE320);
+	DEFINE_MEMBER_FN(ctor, BSDismemberSkinInstance *, 0x00CB1960);
 };
 //STATIC_ASSERT(sizeof(BSDismemberSkinInstance) == 0x44);

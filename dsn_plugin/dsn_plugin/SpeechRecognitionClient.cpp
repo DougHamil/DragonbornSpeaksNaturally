@@ -1,5 +1,7 @@
 #include "SpeechRecognitionClient.h"
 #include "Log.h"
+#include <io.h>
+#include <fcntl.h>
 
 #define BUFSIZE 4096 
 

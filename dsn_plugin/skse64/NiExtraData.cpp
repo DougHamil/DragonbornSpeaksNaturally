@@ -3,11 +3,11 @@
 #include "skse64/NiAllocator.h"
 
 // ??_7BSFaceGenBaseMorphExtraData@@6B@
-RelocAddr<uintptr_t> s_BSFaceGenBaseMorphExtraDataVtbl(0x0161B568);
+RelocAddr<uintptr_t> s_BSFaceGenBaseMorphExtraDataVtbl(0x01678260);
 // ??_7NiStringsExtraData@@6B@
-RelocAddr<uintptr_t> s_NiStringsExtraDataVtbl(0x01780C30);
+RelocAddr<uintptr_t> s_NiStringsExtraDataVtbl(0x017F0A20);
 // ??_7NiBinaryExtraData@@6B@
-RelocAddr<uintptr_t> s_NiBinaryExtraDataVtbl(0x01785190);
+RelocAddr<uintptr_t> s_NiBinaryExtraDataVtbl(0x017F5090);
 
 NiExtraData* NiExtraData::Create(UInt32 size, UInt32 vtbl)
 {

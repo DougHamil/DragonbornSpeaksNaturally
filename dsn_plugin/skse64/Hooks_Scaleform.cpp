@@ -1146,13 +1146,13 @@ public:
 	UInt8						unk30[0x10];	// 30 
 
 	MEMBER_FN_PREFIX(StandardItemData);
-	DEFINE_MEMBER_FN(ctor_data, StandardItemData *, 0x0087D300, GFxMovieView ** movieView, InventoryEntryData * objDesc, UInt64 unk);
+	DEFINE_MEMBER_FN(ctor_data, StandardItemData *, 0x0087F220, GFxMovieView ** movieView, InventoryEntryData * objDesc, UInt64 unk);
 
 	StandardItemData * ctor_Hook(GFxMovieView ** movieView, InventoryEntryData * objDesc, UInt64 unk);
 
 	static uintptr_t GetCtorHookAddress()
 	{
-		static RelocAddr<uintptr_t> kCtorHookAddress(0x0087E4F0 + 0x97);
+		static RelocAddr<uintptr_t> kCtorHookAddress(0x00880410 + 0x97);
 		return kCtorHookAddress.GetUIntPtr();
 	}
 };
@@ -1201,11 +1201,11 @@ public:
 
 
 	MEMBER_FN_PREFIX(MagicItemData);
-	DEFINE_MEMBER_FN(ctor_data, MagicItemData *, 0x008CAB00, GFxMovieView ** movieView, TESForm * pForm, int unk); // unk is ignored by ctor
+	DEFINE_MEMBER_FN(ctor_data, MagicItemData *, 0x008CC9F0, GFxMovieView ** movieView, TESForm * pForm, int unk); // unk is ignored by ctor
 
 	static uintptr_t GetCtorHookAddress()
 	{
-		static RelocAddr<uintptr_t> kCtorHookAddress(0x008CBEC0 + 0x97);
+		static RelocAddr<uintptr_t> kCtorHookAddress(0x008CDDB0 + 0x97);
 		return kCtorHookAddress.GetUIntPtr();
 	}
 
@@ -1245,7 +1245,7 @@ namespace favMenuDataHook
 
 	// 1 - Item
 
-	RelocAddr<uintptr_t> kSetItemData_Base(0x008A2680);
+	RelocAddr<uintptr_t> kSetItemData_Base(0x008A4570);
 	uintptr_t kSetItemData_retn = kSetItemData_Base + 0xCA;
 
 	void SetItemData(IMenu * menu, GFxValue * dataContainer, InventoryEntryData * objDesc)
@@ -1273,7 +1273,7 @@ namespace favMenuDataHook
 	};
 
 	// 2 - Magic
-	RelocAddr<uintptr_t> kSetMagicData_Base(0x008A35D0);
+	RelocAddr<uintptr_t> kSetMagicData_Base(0x008A54C0);
 	uintptr_t kSetMagicData_retn = kSetMagicData_Base + 0xA1;
 
 	void SetMagicData(GFxMovieView * movieView, GFxValue * dataContainer, TESForm * form)
@@ -1296,7 +1296,7 @@ namespace favMenuDataHook
 	};
 
 	// 3 - VampireLord
-	RelocAddr<uintptr_t> kSetVampireData_Base(0x008A39A0);
+	RelocAddr<uintptr_t> kSetVampireData_Base(0x008A5890);
 	uintptr_t kSetVampireData_retn = kSetVampireData_Base + 0x98;
 }
 
@@ -1304,7 +1304,7 @@ namespace favMenuDataHook
 
 namespace enchantMenuDataHook
 {
-	RelocAddr<uintptr_t> kSetData_Base(0x0088E2C0);
+	RelocAddr<uintptr_t> kSetData_Base(0x008901B0);
 	uintptr_t kSetData_retn = kSetData_Base + 0xDF;
 }
 
@@ -1382,13 +1382,13 @@ void EnchantConstructMenu_CategoryListEntry_SetData_Extended(EnchantConstructMen
 
 namespace smithingMenuDataHook
 {
-	RelocAddr<uintptr_t> kSetData_Base(0x0088E170);
+	RelocAddr<uintptr_t> kSetData_Base(0x00890060);
 
 	typedef void (__cdecl * _SetData_Hooked)(GFxValue * dataContainer, InventoryEntryData ** pObjDesc, SmithingMenu * menu);
 	
 	void SetData_Hooked(GFxValue * dataContainer, InventoryEntryData ** pObjDesc, SmithingMenu * menu)
 	{
-		static RelocAddr<uintptr_t> SetData_Hooked_Address(0x00899DA0);
+		static RelocAddr<uintptr_t> SetData_Hooked_Address(0x0089BC90);
 		((_SetData_Hooked)(SetData_Hooked_Address.GetUIntPtr())) (dataContainer, pObjDesc, menu);
 	}
 
@@ -1420,13 +1420,13 @@ namespace smithingMenuDataHook
 namespace craftingMenuDataHook
 {
 	// 80050DF3D298FB230378FF3D7BC6F6D7BBAA21FB+22D
-	RelocAddr<uintptr_t> kSetData_Base(0x0088E560);
+	RelocAddr<uintptr_t> kSetData_Base(0x00890450);
 
 	typedef void (__cdecl * _SetData_Hooked)(GFxValue * dataContainer, ConstructibleObjectMenu::EntryData * entry, ConstructibleObjectMenu * menu);
 	
 	void SetData_Hooked(GFxValue * dataContainer, ConstructibleObjectMenu::EntryData * entry, ConstructibleObjectMenu * menu)
 	{
-		static RelocAddr<uintptr_t> SetData_Hooked_Address(0x00899A30);
+		static RelocAddr<uintptr_t> SetData_Hooked_Address(0x0089B920);
 		((_SetData_Hooked)(SetData_Hooked_Address.GetUIntPtr())) (dataContainer, entry, menu);
 	}
 
@@ -1462,13 +1462,13 @@ namespace alchemyMenuDataHook
 {
 	// Item data
 	// 33BD5B22D8D665F5A8DB6AB3EC6EB874A57E3E53+263
-	RelocAddr<uintptr_t> kSetData_Base(0x0088E410);
+	RelocAddr<uintptr_t> kSetData_Base(0x00890300);
 
 	typedef void (__cdecl * _SetData_Hooked)(GFxValue * dataContainer, AlchemyMenu::EntryData * entry, AlchemyMenu * menu);
 	
 	void SetData_Hooked(GFxValue * dataContainer, AlchemyMenu::EntryData * entry, AlchemyMenu * menu)
 	{
-		static RelocAddr<uintptr_t> SetData_Hooked_Address(0x00899B90);
+		static RelocAddr<uintptr_t> SetData_Hooked_Address(0x0089BA80);
 		((_SetData_Hooked)(SetData_Hooked_Address.GetUIntPtr())) (dataContainer, entry, menu);
 	}
 
@@ -1496,7 +1496,7 @@ namespace alchemyMenuDataHook
 	// Category arguments 
 	// (note: this passes data in arguments to SetCategoriesList. makes it more difficult to extend)
 
-	RelocAddr<uintptr_t> kExtendCategoryArgs_Base(0x0089AD00);
+	RelocAddr<uintptr_t> kExtendCategoryArgs_Base(0x0089CBF0);
 	uintptr_t kExtendCategoryArgs_retn = kExtendCategoryArgs_Base + 0x59D;
 
 	class GFxInvokeHook
@@ -1602,7 +1602,7 @@ void InstallHooks(GFxMovieView * view)
 	globals.SetMember("skse", &skse);
 }
 
-RelocAddr <uintptr_t> kInstallHooks_Enter(0x00F27F10 + 0x1D9);
+RelocAddr <uintptr_t> kInstallHooks_Enter(0x00F2B480 + 0x1D9);
 
 void InstallHooks_Entry(GFxMovieView *pthis, UInt32 unk)
 {

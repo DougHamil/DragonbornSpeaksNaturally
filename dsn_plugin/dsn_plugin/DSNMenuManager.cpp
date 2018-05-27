@@ -6,7 +6,7 @@
 
 uintptr_t MENU_MANAGER_ADDR[3] = {
 	0x01EE5B20,	// SE
-	0x01F7E100, // VR
+	0x01F83200, // VR
 	0x01F83200	// VR BETA
 };
 

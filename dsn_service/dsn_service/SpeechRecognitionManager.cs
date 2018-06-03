@@ -14,7 +14,9 @@ namespace DSN {
         private SpeechRecognitionEngine DSN;
         private float dialogueMinimumConfidence = 0.5f; // Dialogue can be more generous in the min confidence because phrases are usually longer and more distinct amongst themselves
         private float commandMinimumConfidence = 0.7f;
+        private bool isRecognizing = false; // Set to true after starting recognition, set to false after stopping recognition.
         private bool isDialogueMode = false;
+        private ISpeechRecognitionGrammarProvider[] grammarProviders;
 
         public SpeechRecognitionManager() {
             string locale = Configuration.Get("SpeechRecognition", "Locale", CultureInfo.InstalledUICulture.Name);
@@ -25,31 +27,73 @@ namespace DSN {
 
             this.DSN = new SpeechRecognitionEngine(new CultureInfo(locale));
             this.DSN.UpdateRecognizerSetting("CFGConfidenceRejectionThreshold", 10); // Range is 0-100
-            this.DSN.SetInputToDefaultAudioDevice();
             this.DSN.EndSilenceTimeoutAmbiguous = TimeSpan.FromMilliseconds(250);
+            this.DSN.AudioStateChanged += DSN_AudioStateChanged;
             this.DSN.AudioSignalProblemOccurred += DSN_AudioSignalProblemOccurred;
             this.DSN.SpeechRecognized += DSN_SpeechRecognized;
             this.DSN.SpeechRecognitionRejected += DSN_SpeechRecognitionRejected;
+
+            WaitRecordingDevice();
         }
 
+        private void WaitRecordingDevice() {
+            // Retry until there is an audio input device available
+            bool logWaitingRecDev = false;
+            for (; ; ) {
+                try {
+                    this.DSN.SetInputToDefaultAudioDevice();
+                    Trace.TraceInformation("The recording device is ready.");
+                    break;
+                } catch (System.InvalidOperationException) {
+                    if (!logWaitingRecDev) {
+                        Trace.TraceInformation("Waiting for available recording device...");
+                        logWaitingRecDev = true;
+                    }
+                    System.Threading.Thread.Sleep(1000);
+                }
+            }
+        }
+
+        private void DSN_AudioStateChanged(object sender, AudioStateChangedEventArgs e) {
+            if (Configuration.Get("SpeechRecognition", "bLogAudioSignalIssues", "0") == "1") {
+                Trace.TraceInformation("Audio state changed: {0}", e.AudioState.ToString());
+            }
+
+            if (e.AudioState == AudioState.Stopped && isRecognizing) {
+                Trace.TraceInformation("The recording device is not available.");
+                WaitRecordingDevice();
+                StartSpeechRecognition(isDialogueMode, grammarProviders);
+            }
+        }
 
         private void DSN_AudioSignalProblemOccurred(object sender, AudioSignalProblemOccurredEventArgs e) {
             if(Configuration.Get("SpeechRecognition", "bLogAudioSignalIssues", "0") == "1") {
-                Trace.TraceInformation("Audio signal problem occurred during speech recognition:");
-                Trace.TraceInformation(e.AudioSignalProblem.ToString());
+                Trace.TraceInformation("Audio signal problem occurred during speech recognition: {0}", e.AudioSignalProblem.ToString());
             }
         }
 
         public void StopRecognition() {
-            this.DSN.RecognizeAsyncCancel();
+            if (isRecognizing) {
+                this.DSN.RecognizeAsyncCancel();
+                isRecognizing = false;
+            }
         }
 
         public void StartSpeechRecognition(bool isDialogueMode, params ISpeechRecognitionGrammarProvider[] grammarProviders) {
             try {
                 this.isDialogueMode = isDialogueMode;
-                this.DSN.RecognizeAsyncCancel();
+                this.grammarProviders = grammarProviders;
+
+                StopRecognition(); // Cancel previous recognition
+
                 List<Grammar> allGrammars = grammarProviders.SelectMany((x) => x.GetGrammars()).ToList();
-                setGrammar(allGrammars);
+                // Error is thrown if no grammars are loaded
+                if (allGrammars.Count > 0) {
+                    setGrammar(allGrammars);
+                    this.DSN.RecognizeAsync(RecognizeMode.Multiple);
+                    isRecognizing = true;
+                }
+
             } catch (Exception e) {
                 Trace.TraceError("Failed to start new phrase recognition due to exception");
                 Trace.TraceError(e.ToString());
@@ -62,9 +106,6 @@ namespace DSN {
             foreach (Grammar grammar in grammars) {
                 this.DSN.LoadGrammarAsync(grammar);
             }
-            // Error is thrown if no grammars are loaded
-            if(grammars.Count > 0)
-                this.DSN.RecognizeAsync(RecognizeMode.Multiple);
         }
 
         private void DSN_SpeechRecognitionRejected(object sender, SpeechRecognitionRejectedEventArgs e) {

@@ -10,6 +10,22 @@ using System.Threading.Tasks;
 
 namespace DSN {
 
+    public class ReplPhrase
+    {
+        public string pattern = "";
+        public string replacement = "";
+
+        public ReplPhrase(string input)
+        {
+            string[] tokens = input.Split(new string[] {"-->"},2,StringSplitOptions.None);
+            pattern = tokens[0];
+            if (tokens.Length > 1)
+                replacement = tokens[1];
+
+            Trace.TraceInformation("replacePhrase: " + pattern + " with " + replacement);
+        }
+    }
+
     class Configuration {
         private static readonly string CONFIG_FILE_NAME = "DragonbornSpeaksNaturally.ini";
         private static readonly string COMMAND_FILE_NAME = "DragonbornSpeaksNaturally.ini";
@@ -24,6 +40,9 @@ namespace DSN {
         private static IniData local = null;
         private static IniData merged = null;
         private static CommandList consoleCommandList = null;
+        private static List<ReplPhrase> replacePhrases = null;
+        private static List<ReplPhrase> replaceCategoryPhrases = null;
+        private static List<ReplPhrase> replaceRegExPhrases = null;
 
         private Configuration() { }
 
@@ -42,6 +61,49 @@ namespace DSN {
                 return list;
             }
             return new List<string>();
+        }
+
+        public static void LoadReplacePhrases()
+        {
+            replacePhrases = new List<ReplPhrase>();
+            replaceRegExPhrases = new List<ReplPhrase>();
+            replaceCategoryPhrases = new List<ReplPhrase>();
+
+            KeyDataCollection keyCollection = merged["Favorites"];
+
+            foreach (var keyData in keyCollection)
+            {
+                if (keyData.KeyName.StartsWith("ReplacePhrase"))
+                {
+                    replacePhrases.Add(new ReplPhrase(keyData.Value));
+                }
+                if (keyData.KeyName.StartsWith("ReplaceCategoryPhrase"))
+                {
+                    replaceCategoryPhrases.Add(new ReplPhrase(keyData.Value));
+                }
+                else if (keyData.KeyName.StartsWith("ReplaceRegExPhrase"))
+                {
+                    replaceRegExPhrases.Add(new ReplPhrase(keyData.Value));
+                }
+            }
+        }
+
+        public static List<ReplPhrase> GetReplacePhrases()
+        {
+            getData();
+            return replacePhrases;
+        }
+
+        public static List<ReplPhrase> GetReplaceRegExPhrases()
+        {
+            getData();
+            return replaceRegExPhrases;
+        }
+
+        public static List<ReplPhrase> GetReplaceCategoryPhrases()
+        {
+            getData();
+            return replaceCategoryPhrases;
         }
 
         public static CommandList GetConsoleCommandList() {
@@ -68,6 +130,7 @@ namespace DSN {
                 merged = new IniData();
                 merged.Merge(global);
                 merged.Merge(local);
+                LoadReplacePhrases();
             }
 
             return merged;

@@ -15,18 +15,10 @@ namespace DSN {
 
             List<ReplPhrase> replacePhrases = Configuration.GetReplacePhrases();
             List<ReplPhrase> replaceRegExPhrases = Configuration.GetReplaceRegExPhrases();
-            List<ReplPhrase> replaceCategoryPhrases = Configuration.GetReplaceCategoryPhrases();
 
             foreach (ReplPhrase replacePhrase in replaceRegExPhrases)
             {
                 phrase = Regex.Replace(phrase, replacePhrase.pattern, replacePhrase.replacement);
-            }
-
-            foreach (ReplPhrase replacePhrase in replaceCategoryPhrases)
-            {
-                string pattern = @"\b(" + replacePhrase.pattern + @")\:";
-                // Trace.TraceInformation("Trying to replace " + pattern + " with " + replacePhrase.replacement);
-                phrase = Regex.Replace(phrase, pattern, replacePhrase.replacement);
             }
 
             foreach (ReplPhrase replacePhrase in replacePhrases)

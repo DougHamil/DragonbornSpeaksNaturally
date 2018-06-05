@@ -41,7 +41,6 @@ namespace DSN {
         private static IniData merged = null;
         private static CommandList consoleCommandList = null;
         private static List<ReplPhrase> replacePhrases = null;
-        private static List<ReplPhrase> replaceCategoryPhrases = null;
         private static List<ReplPhrase> replaceRegExPhrases = null;
 
         private Configuration() { }
@@ -67,7 +66,6 @@ namespace DSN {
         {
             replacePhrases = new List<ReplPhrase>();
             replaceRegExPhrases = new List<ReplPhrase>();
-            replaceCategoryPhrases = new List<ReplPhrase>();
 
             KeyDataCollection keyCollection = merged["Favorites"];
 
@@ -76,10 +74,6 @@ namespace DSN {
                 if (keyData.KeyName.StartsWith("ReplacePhrase"))
                 {
                     replacePhrases.Add(new ReplPhrase(keyData.Value));
-                }
-                if (keyData.KeyName.StartsWith("ReplaceCategoryPhrase"))
-                {
-                    replaceCategoryPhrases.Add(new ReplPhrase(keyData.Value));
                 }
                 else if (keyData.KeyName.StartsWith("ReplaceRegExPhrase"))
                 {
@@ -98,12 +92,6 @@ namespace DSN {
         {
             getData();
             return replaceRegExPhrases;
-        }
-
-        public static List<ReplPhrase> GetReplaceCategoryPhrases()
-        {
-            getData();
-            return replaceCategoryPhrases;
         }
 
         public static CommandList GetConsoleCommandList() {

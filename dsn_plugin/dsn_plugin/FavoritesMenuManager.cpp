@@ -171,7 +171,11 @@ void FavoritesMenuManager::RefreshFavorites() {
 			FavoriteMenuItem favorite = favorites[i];
 			command += "|" + favorite.fullname + "," + std::to_string(favorite.TESFormId) + "," + std::to_string(favorite.itemId) + "," + std::to_string(favorite.isHanded) + "," + std::to_string(favorite.itemType);
 		}
-		SpeechRecognitionClient::getInstance()->WriteLine(command);
+
+		if (lastFavoritesCommand != command) {
+			SpeechRecognitionClient::getInstance()->WriteLine(command);
+			lastFavoritesCommand = command;
+		}
 	}
 }
 

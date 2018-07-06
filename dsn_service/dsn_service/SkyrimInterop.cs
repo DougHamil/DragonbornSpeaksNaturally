@@ -44,6 +44,7 @@ namespace DSN {
 
         public static void Stop() {
             submissionThread.Abort();
+            recognizer.Stop();
         }
 
         public static void SubmitCommand(string command) {
@@ -67,11 +68,14 @@ namespace DSN {
             try {
                 while (true) {
                     string input = Console.ReadLine();
-                    Trace.TraceInformation("Received command: {0}", input);
 
-                    // input will be null when Skyrim is closed
-                    if (input == null)
+                    // input will be null when Skyrim is terminated
+                    if (input == null) {
+                        Trace.TraceInformation("Skyrim is terminated, recognition service will quit.");
                         break;
+                    }
+
+                    Trace.TraceInformation("Received command: {0}", input);
 
                     string[] tokens = input.Split('|');
                     string command = tokens[0];

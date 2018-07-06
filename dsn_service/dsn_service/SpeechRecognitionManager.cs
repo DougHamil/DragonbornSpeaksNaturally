@@ -9,15 +9,21 @@ using System.Threading;
 namespace DSN {
     class SpeechRecognitionManager {
 
+        private const long STATUS_STOPPED        = 0; // not in recognizing
+        private const long STATUS_RECOGNIZING    = 1; // in recognizing
+        private const long STATUS_WAITING_DEVICE = 2; // waiting for record device
+
         public delegate void DialogueLineRecognitionHandler(RecognitionResult result);
         public event DialogueLineRecognitionHandler OnDialogueLineRecognized;
 
-        private SpeechRecognitionEngine DSN; // Need thread safety.
-        private float dialogueMinimumConfidence = 0.5f; // Dialogue can be more generous in the min confidence because phrases are usually longer and more distinct amongst themselves
+        private long recognitionStatus = STATUS_STOPPED; // Need thread safety.
+        private readonly SpeechRecognitionEngine DSN;    // Need thread safety.
+        private float dialogueMinimumConfidence = 0.5f;  // Dialogue can be more generous in the min confidence because phrases are usually longer and more distinct amongst themselves
         private float commandMinimumConfidence = 0.7f;
-        private int isRecognizing = 0; // Set to 1 after starting recognition, set to 0 after stopping recognition. Need thread safety.
         private bool isDialogueMode = false;
         private ISpeechRecognitionGrammarProvider[] grammarProviders;
+
+        private Thread waitingDeviceThread;
 
         public SpeechRecognitionManager() {
             string locale = Configuration.Get("SpeechRecognition", "Locale", CultureInfo.InstalledUICulture.Name);
@@ -34,11 +40,28 @@ namespace DSN {
             this.DSN.SpeechRecognized += DSN_SpeechRecognized;
             this.DSN.SpeechRecognitionRejected += DSN_SpeechRecognitionRejected;
 
-            WaitRecordingDevice();
+            WaitRecordingDeviceNonBlocking();
         }
 
-        private void WaitRecordingDevice() {
+        public void Stop() {
+            if (waitingDeviceThread != null) {
+                waitingDeviceThread.Abort();
+            }
+        }
+
+        private void WaitRecordingDeviceNonBlocking() {
+            // Waiting recording device in a new thread to avoid blocking
+            waitingDeviceThread = new Thread(DoWaitRecordingDevice);
+            waitingDeviceThread.Start();
+        }
+
+        private void DoWaitRecordingDevice() {
             lock (DSN) {
+                StopRecognition();
+
+                // Thread-safe:recognitionStatus = STATUS_WAITING_DEVICE
+                Interlocked.Exchange(ref recognitionStatus, STATUS_WAITING_DEVICE);
+
                 // Retry until there is an audio input device available
                 bool logWaitingRecDev = false;
                 for (; ; ) {
@@ -54,7 +77,17 @@ namespace DSN {
                         System.Threading.Thread.Sleep(1000);
                     }
                 }
+
+                // Thread-safe:recognitionStatus = STATUS_STOPPED
+                Interlocked.Exchange(ref recognitionStatus, STATUS_STOPPED);
+
+                // Restart recognition
+                if (grammarProviders != null && grammarProviders.Length > 0) {
+                    StartSpeechRecognition(isDialogueMode, grammarProviders);
+                }
             }
+
+            waitingDeviceThread = null;
         }
 
         private void DSN_AudioStateChanged(object sender, AudioStateChangedEventArgs e) {
@@ -62,11 +95,10 @@ namespace DSN {
                 Trace.TraceInformation("Audio state changed: {0}", e.AudioState.ToString());
             }
 
-            // Thread-safe: if (e.AudioState == AudioState.Stopped && isRecognizing == 1)
-            if (e.AudioState == AudioState.Stopped && Interlocked.CompareExchange(ref isRecognizing, 1, 1) == 1) {
+            // Thread-safe: if (e.AudioState == AudioState.Stopped && recognitionStatus == STATUS_RECOGNIZING)
+            if (e.AudioState == AudioState.Stopped && Interlocked.Read(ref recognitionStatus) == STATUS_RECOGNIZING) {
                 Trace.TraceInformation("The recording device is not available.");
-                WaitRecordingDevice();
-                StartSpeechRecognition(isDialogueMode, grammarProviders);
+                WaitRecordingDeviceNonBlocking();
             }
         }
 
@@ -77,27 +109,34 @@ namespace DSN {
         }
 
         private void StopRecognition() {
-            // Thread-safe: if (isRecognizing == 1) { isRecognizing = 0; ... }
-            if (Interlocked.CompareExchange(ref isRecognizing, 0, 1) == 1) {
+            // Thread-safe: if (recognitionStatus == STATUS_RECOGNIZING) { recognitionStatus = STATUS_STOPPED; ... }
+            if (Interlocked.CompareExchange(ref recognitionStatus, STATUS_STOPPED, STATUS_RECOGNIZING) == STATUS_RECOGNIZING) {
                 this.DSN.RecognizeAsyncCancel();
             }
         }
 
         public void StartSpeechRecognition(bool isDialogueMode, params ISpeechRecognitionGrammarProvider[] grammarProviders) {
             try {
-                lock (DSN) {
-                    this.isDialogueMode = isDialogueMode;
-                    this.grammarProviders = grammarProviders;
+                this.isDialogueMode = isDialogueMode;
+                this.grammarProviders = grammarProviders;
 
+                // Thread-safe: if (recognitionStatus == STATUS_WAITING_DEVICE)
+                if (Interlocked.Read(ref recognitionStatus) == STATUS_WAITING_DEVICE) {
+                    // Avoid blocking and the program cannot quit when Skyrim is terminated
+                    Trace.TraceInformation("Recognition not start because waiting for recording device");
+                    return;
+                }
+
+                lock (DSN) {
                     StopRecognition(); // Cancel previous recognition
 
                     List<Grammar> allGrammars = grammarProviders.SelectMany((x) => x.GetGrammars()).ToList();
                     // Error is thrown if no grammars are loaded
                     if (allGrammars.Count > 0) {
-                        setGrammar(allGrammars);
+                        SetGrammar(allGrammars);
                         this.DSN.RecognizeAsync(RecognizeMode.Multiple);
-                        // Thread-safe: isRecognizing = 1
-                        Interlocked.CompareExchange(ref isRecognizing, 1, 0);
+                        // Thread-safe: recognitionStatus = STATUS_RECOGNIZING
+                        Interlocked.Exchange(ref recognitionStatus, STATUS_RECOGNIZING);
                     }
                 }
             } catch (Exception e) {
@@ -106,7 +145,7 @@ namespace DSN {
             }
         }
 
-        private void setGrammar(List<Grammar> grammars) {
+        private void SetGrammar(List<Grammar> grammars) {
             this.DSN.RequestRecognizerUpdate();
             this.DSN.UnloadAllGrammars();
             foreach (Grammar grammar in grammars) {
@@ -115,6 +154,7 @@ namespace DSN {
         }
 
         private void DSN_SpeechRecognitionRejected(object sender, SpeechRecognitionRejectedEventArgs e) {
+            // nothing to do
         }
 
         private void DSN_SpeechRecognized(object sender, SpeechRecognizedEventArgs e) {

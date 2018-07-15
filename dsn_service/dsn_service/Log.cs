@@ -22,7 +22,7 @@ namespace DSN {
                 Trace.Listeners.Add(listener);
             }
             catch(Exception ex) {
-                Console.Error.WriteLine("Failed to create log file at " + logFilePath);
+                Console.Error.WriteLine("Failed to create log file at " + logFilePath + ": {0}", ex.ToString());
             }
     
         }

@@ -38,4 +38,5 @@ public:
 private:
 	FavoritesMenuManager();
 	std::vector<FavoriteMenuItem> favorites;
+	std::string lastFavoritesCommand;
 };

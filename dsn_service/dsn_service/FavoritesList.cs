@@ -24,7 +24,7 @@ namespace DSN {
 
             Trace.TraceInformation("Received favorites list: {0}", input);
 
-            string equipPrefx = Configuration.Get("Favorites", "equipPhrasePrefix", "equip");
+            string equipPrefix = Configuration.Get("Favorites", "equipPhrasePrefix", "equip");
             commandsByGrammar.Clear();
             string[] itemTokens = input.Split('|');
             foreach(string itemStr in itemTokens) {
@@ -36,7 +36,7 @@ namespace DSN {
                     bool isSingleHanded = int.Parse(tokens[3]) > 0;
                     int typeId = int.Parse(tokens[4]);
 
-                    string phrase = Phrases.normalize(equipPrefx + " " + itemName);
+                    string phrase = equipPrefix + " " + Phrases.normalize(itemName);
                     string command = formId + ";" + itemId + ";" + typeId + ";";
 
                     GrammarBuilder grammarBuilder = new GrammarBuilder(phrase);

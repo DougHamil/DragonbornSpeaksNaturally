@@ -10,17 +10,52 @@ namespace DSN {
     class FavoritesList : ISpeechRecognitionGrammarProvider {
 
         private  Dictionary<Grammar, string> commandsByGrammar = new Dictionary<Grammar, string>();
-        private string leftHandSuffix;
-        private string rightHandSuffix;
+        private string leftHandSuffix = Configuration.Get("Favorites", "equipLeftSuffix", "left");
+        private string rightHandSuffix = Configuration.Get("Favorites", "equipRightSuffix", "right");
+
+        private HashSet<string> knownEquipmentTypes = new HashSet<string>
+        {
+            "daggar", "mace", "sword", "axe", "battleaxe", "greatsword", "warhammer", "bow", "crossbow", "shield"
+        };
+
+        public string ProbableEquipmentType(string itemName)
+        {
+            var tokens = new HashSet<string> { };
+
+            foreach (string token in itemName.Split(" [](),|:".ToCharArray()))
+            {
+                tokens.Add(token.ToLower());
+            }
+
+            var intersection = tokens.Intersect(knownEquipmentTypes);
+            if (intersection.Count() == 0)
+                return null;
+            else
+                return intersection.First();
+        }
+
+        public void BuildAndAddGrammar(string phrase, string command, bool isSingleHanded)
+        {
+            GrammarBuilder grammarBuilder = new GrammarBuilder(phrase);
+
+            // Append hand choice if necessary
+            if (isSingleHanded)
+            {
+                Choices handChoice = new Choices(new string[] { leftHandSuffix, rightHandSuffix });
+                grammarBuilder.Append(handChoice, 0, 1); // Optional left/right. When excluded, try to equip to both hands
+            }
+
+            Grammar grammar = new Grammar(grammarBuilder);
+            grammar.Name = phrase;
+            commandsByGrammar[grammar] = command;
+        }
 
         public void Update(string input) {
-
             if(Configuration.Get("Favorites", "enabled", "1") == "0") {
                 return;
             }
 
-            leftHandSuffix = Configuration.Get("Favorites", "equipLeftSuffix", "left");
-            rightHandSuffix = Configuration.Get("Favorites", "equipRightSuffix", "right");
+            var firstEquipmentOfType = new Dictionary<string, string> { };
 
             Trace.TraceInformation("Received favorites list: {0}", input);
 
@@ -28,7 +63,8 @@ namespace DSN {
             commandsByGrammar.Clear();
             string[] itemTokens = input.Split('|');
             foreach(string itemStr in itemTokens) {
-                try {
+                try
+                {
                     string[] tokens = itemStr.Split(',');
                     string itemName = tokens[0];
                     long formId = long.Parse(tokens[1]);
@@ -39,17 +75,15 @@ namespace DSN {
                     string phrase = equipPrefix + " " + Phrases.normalize(itemName);
                     string command = formId + ";" + itemId + ";" + typeId + ";";
 
-                    GrammarBuilder grammarBuilder = new GrammarBuilder(phrase);
+                    BuildAndAddGrammar(phrase, command, isSingleHanded);
 
-                    // Append hand choice if necessary
-                    if (isSingleHanded) {
-                        Choices handChoice = new Choices(new string[] { leftHandSuffix, rightHandSuffix });
-                        grammarBuilder.Append(handChoice, 0, 1); // Optional left/right. When excluded, try to equip to both hands
+                    // Are we looking at an equipment of some sort?
+                    // Record the first item of a specific weapon type
+                    string equipmentType = ProbableEquipmentType(itemName);
+                    if(equipmentType != null && firstEquipmentOfType.ContainsKey(equipmentType) == false)
+                    {
+                        BuildAndAddGrammar(equipPrefix + " " + equipmentType, command, isSingleHanded);
                     }
-
-                    Grammar grammar = new Grammar(grammarBuilder);
-                    grammar.Name = phrase;
-                    commandsByGrammar[grammar] = command;
                 } catch(Exception ex) {
                     Trace.TraceError("Failed to parse {0} due to exception:\n{1}", itemStr, ex.ToString());
                 }

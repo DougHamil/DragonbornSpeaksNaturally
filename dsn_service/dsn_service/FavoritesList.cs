@@ -14,6 +14,8 @@ namespace DSN {
         private  Dictionary<Grammar, string> commandsByGrammar = new Dictionary<Grammar, string>();
         private string leftHandSuffix = Configuration.Get("Favorites", "equipLeftSuffix", "left");
         private string rightHandSuffix = Configuration.Get("Favorites", "equipRightSuffix", "right");
+        private string bothHandsSuffix = Configuration.Get("Favorites", "equipBothSuffix", "both");
+        private string mainHand = Configuration.Get("Favorites", "mainHand", "none");
 
         private HashSet<string> knownEquipmentTypes = new HashSet<string>
         {
@@ -43,7 +45,7 @@ namespace DSN {
             // Append hand choice if necessary
             if (isSingleHanded)
             {
-                Choices handChoice = new Choices(new string[] { leftHandSuffix, rightHandSuffix });
+                Choices handChoice = new Choices(new string[] { bothHandsSuffix, leftHandSuffix, rightHandSuffix });
                 grammarBuilder.Append(handChoice, 0, 1); // Optional left/right. When excluded, try to equip to both hands
             }
 
@@ -143,17 +145,29 @@ namespace DSN {
         }
 
         public string GetCommandForResult(RecognitionResult result) {
+            var handednessMap = new Dictionary<string, string>
+            {
+                { "both", "0" },
+                { "right", "1" },
+                { "left", "2" },
+            };
+
             Grammar grammar = result.Grammar;
             if (commandsByGrammar.ContainsKey(grammar)) {
                 string command = commandsByGrammar[grammar];
-                // Determine handedness
-                if (result.Text.EndsWith(rightHandSuffix)) {
-                    command += "1";
-                } else if (result.Text.EndsWith(leftHandSuffix)) {
-                    command += "2";
+                string lastToken = result.Text.Split(' ').Last();
+
+                // Did the user ask to put the item in a specific hand?
+                if(handednessMap.ContainsKey(lastToken)) {
+                    command += handednessMap[lastToken];
+                } else if (handednessMap.ContainsKey(mainHand)) { 
+                    // The user didn't ask for a specific hand, supply a user specified default
+                    command += handednessMap[mainHand];
                 } else {
+                    // Try equipping the item in both hands as a last resort
                     command += "0";
                 }
+                
                 return command;
             }
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace DSN {
     class Phrases {
         public static string normalize(string phrase) {
-            phrase = Regex.Replace(phrase, @"\(.*?\)", string.Empty);
+            phrase = Regex.Replace(phrase, @"\(.*?\)|\{.*?\}|\|.*?\||\[.*?\]|\b.*\:\s", string.Empty);
             phrase = Regex.Replace(phrase, "[\"']", string.Empty);
             phrase = phrase.Replace('-', ' ');
             RegexOptions options = RegexOptions.None;

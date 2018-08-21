@@ -85,7 +85,7 @@ namespace DSN {
                 local = new IniData();
         }
 
-        private static string resolveFilePath(string filename) {
+        public static string resolveFilePath(string filename) {
             foreach (string directory in SEARCH_DIRECTORIES) {
                 string filepath = directory + filename;
                 if (File.Exists(filepath)) {

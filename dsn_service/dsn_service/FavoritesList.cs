@@ -5,6 +5,8 @@ using System.Linq;
 using System.Speech.Recognition;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
+using System.IO;
 
 namespace DSN {
     class FavoritesList : ISpeechRecognitionGrammarProvider {
@@ -50,12 +52,51 @@ namespace DSN {
             commandsByGrammar[grammar] = command;
         }
 
+        // Locates and loads item name replacement maps
+        // Returns dynamic map/dictionary or null when the replacement map files cannot be located
+        public dynamic LoadItemNameMap()
+        {
+            string filepath = Configuration.resolveFilePath("item-name-map.json");
+            if(File.Exists(filepath))
+            {
+                return LoadItemNameMap(filepath);
+            }
+            return null;
+        }
+        
+        // Returns a map/dictionary or throws exception when the file cannot be opened/read
+        public dynamic LoadItemNameMap(string path)
+        {
+            var json = System.IO.File.ReadAllText(path);
+            JavaScriptSerializer jsonSerializer = new JavaScriptSerializer();
+            return jsonSerializer.Deserialize<dynamic>(json);
+        }
+
+        public string MaybeReplaceItemName(dynamic nameMap, string itemName)
+        {
+            if (nameMap == null)
+                return itemName;
+
+            try
+            {
+                return nameMap[itemName];
+            }
+            catch (KeyNotFoundException)
+            {
+                return itemName;
+            }
+        }
+
+ 
+
         public void Update(string input) {
             if(Configuration.Get("Favorites", "enabled", "1") == "0") {
                 return;
             }
 
             var firstEquipmentOfType = new Dictionary<string, string> { };
+           
+            dynamic itemNameMap = LoadItemNameMap();
 
             Trace.TraceInformation("Received favorites list: {0}", input);
 
@@ -71,6 +112,8 @@ namespace DSN {
                     long itemId = long.Parse(tokens[2]);
                     bool isSingleHanded = int.Parse(tokens[3]) > 0;
                     int typeId = int.Parse(tokens[4]);
+
+                    itemName = MaybeReplaceItemName(itemNameMap, itemName);
 
                     string phrase = equipPrefix + " " + Phrases.normalize(itemName);
                     string command = formId + ";" + itemId + ";" + typeId + ";";

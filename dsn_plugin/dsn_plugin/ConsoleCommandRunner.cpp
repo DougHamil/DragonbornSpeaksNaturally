@@ -151,14 +151,14 @@ void ConsoleCommandRunner::RunCustomCommandPress(const std::vector<std::string>&
 			// key code dec
 			key = strtol(keyStr.c_str(), NULL, 10);
 		}
-		else if ('A' <= keyStr[0] && keyStr[0] <= 'Z') {
+		/*else if ('A' <= keyStr[0] && keyStr[0] <= 'Z') {
 			// character
 			key = (int)keyStr[0];
 		}
 		else if ('a' <= keyStr[0] && keyStr[0] <= 'z') {
 			// lower character, to upper
 			key = (int)(keyStr[0] - ('a' - 'A'));
-		}
+		}*/
 		else {
 			continue;
 		}
@@ -183,9 +183,10 @@ void ConsoleCommandRunner::RunCustomCommandPress(const std::vector<std::string>&
 		for (auto itr = keyDown.begin(); itr != keyDown.end(); itr++) {
 			INPUT input;
 			ZeroMemory(&input, sizeof(input));
-
 			input.type = INPUT_KEYBOARD;
-			input.ki.wVk = *itr;
+			input.ki.dwFlags = KEYEVENTF_SCANCODE;
+			input.ki.wScan = *itr;
+
 			SendInput(1, &input, sizeof(INPUT));
 		}
 
@@ -198,10 +199,10 @@ void ConsoleCommandRunner::RunCustomCommandPress(const std::vector<std::string>&
 
 			INPUT input;
 			ZeroMemory(&input, sizeof(input));
-
 			input.type = INPUT_KEYBOARD;
-			input.ki.wVk = (*itr).second;
-			input.ki.dwFlags = KEYEVENTF_KEYUP;
+			input.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
+			input.ki.wScan = (*itr).second;
+
 			SendInput(1, &input, sizeof(INPUT));
 		}
 	}

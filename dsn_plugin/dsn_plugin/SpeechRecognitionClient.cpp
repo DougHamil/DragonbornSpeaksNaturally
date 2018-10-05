@@ -1,4 +1,5 @@
 #include "SpeechRecognitionClient.h"
+#include "ConsoleCommandRunner.h"
 #include "Log.h"
 #include <io.h>
 #include <fcntl.h>
@@ -91,6 +92,11 @@ std::string SpeechRecognitionClient::PopEquip() {
 }
 
 void SpeechRecognitionClient::EnqueueCommand(std::string command) {
+	// The custom command will be executed on the current thread,
+	// and the Skyrim command will be executed in the game thread.
+	if (ConsoleCommandRunner::TryRunCustomCommand(command)) {
+		return;
+	}
 	queueLock.lock();
 	queuedCommands.push(command);
 	queueLock.unlock();

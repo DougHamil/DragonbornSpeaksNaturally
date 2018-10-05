@@ -1,5 +1,6 @@
 #include "Hooks.h"
 #include "SpeechRecognitionClient.h"
+#include "ConsoleCommandRunner.h"
 #include "Log.h"
 #include "common/IPrefix.h"
 #include "skse64_common/BranchTrampoline.h"
@@ -43,6 +44,7 @@ extern "C"	{
 			Hooks_Inject();
 
 			SpeechRecognitionClient::Initialize();
+			ConsoleCommandRunner::RegisterCustomCommands();
 
 			break;
 

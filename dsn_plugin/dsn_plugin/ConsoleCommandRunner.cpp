@@ -35,6 +35,7 @@ std::vector<std::string> splitParams(std::string s) {
 std::mutex ConsoleCommandRunner::customCmdQueueLock;
 HANDLE ConsoleCommandRunner::customCmdQueueSemaphore;
 std::queue<std::vector<std::string>> ConsoleCommandRunner::customCmdQueue;
+std::unordered_map<std::string/* name */, std::function<void(std::vector<std::string>)>/* func */> ConsoleCommandRunner::customCmdList;
 
 void ConsoleCommandRunner::RunCommand(std::string command) {
 	if (!consoleMenu) {
@@ -85,7 +86,8 @@ bool ConsoleCommandRunner::TryAddCustomCommand(const std::string & command) {
 	}
 	//Log::info(std::string("action: ") + action);
 
-	if (action == "press") {
+	auto itr = customCmdList.find(action);
+	if (itr != customCmdList.end()) {
 		// mutex is automatically released when scopeLock goes out of scope
 		std::lock_guard<std::mutex> scopeLock(customCmdQueueLock);
 
@@ -113,19 +115,28 @@ DWORD WINAPI ConsoleCommandRunner::CustomCommandThread(void* ctx) {
 		std::vector<std::string> params = customCmdQueue.front();
 		customCmdQueue.pop();
 
-		if (params[0] == "press") {
-			RunCustomCommandPress(params);
+		if (params.size() == 0) {
+			continue;
+		}
+
+		auto itr = customCmdList.find(params[0]);
+		if (itr != customCmdList.end()) {
+			itr->second(params);
 		}
 	}
 }
 
 void ConsoleCommandRunner::Initialize() {
+	// Register custom commands
+	customCmdList["press"] = CustomCommandPress;
+
+	// Start a thread that runs custom commands
 	CreateThread(NULL, 0, ConsoleCommandRunner::CustomCommandThread, NULL, 0L, NULL);
 }
 
 
 
-void ConsoleCommandRunner::RunCustomCommandPress(std::vector<std::string> params) {
+void ConsoleCommandRunner::CustomCommandPress(std::vector<std::string> params) {
 	std::vector<UInt32 /*key*/> keyDown;
 	std::map<UInt32 /*time*/, UInt32 /*key*/> keyUp;
 

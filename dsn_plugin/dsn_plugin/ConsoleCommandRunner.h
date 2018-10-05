@@ -27,10 +27,17 @@ public:
 	static bool TryRunCustomCommand(const std::string &command);
 
 	// Add a new command: press <key name or DirectInput Scan Code> [millisecond]
-	// Windows Virtual-Key Codes: https://www.creationkit.com/index.php?title=Input_Script#DXScanCodes
+	// Windows DirectInput scan codes: https://www.creationkit.com/index.php?title=Input_Script#DXScanCodes
+	// Avaliable key names: https://github.com/YihaoPeng/DragonbornSpeaksNaturally/blob/master/dsn_plugin/dsn_plugin/KeyCode.hpp
 	//
 	// Description: Simulate pressing the specified key the specified milliseconds.
 	//              Used to cast skills or dragon shouts or do other actions.
+	//
+	//      Tips 1: If you want to use scan code 0-9, please add the prefix 0x, such as 0x01 for esc.
+	//              A single digit without 0x prefix will be considered a digit key instead of a key code.
+	//
+	//      Tips 2: Only the currently active window can receive the simulated key.
+	//              Activate the Skyrim window by calling activewindow command if necessary.
 	//
 	// Example:
 	//         press m

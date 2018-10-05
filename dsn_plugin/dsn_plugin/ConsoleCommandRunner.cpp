@@ -32,9 +32,6 @@ std::vector<std::string> splitParams(std::string s) {
 	return tokens;
 }
 
-std::mutex ConsoleCommandRunner::customCmdQueueLock;
-HANDLE ConsoleCommandRunner::customCmdQueueSemaphore;
-std::queue<std::vector<std::string>> ConsoleCommandRunner::customCmdQueue;
 std::unordered_map<std::string/* name */, std::function<void(std::vector<std::string>)>/* func */> ConsoleCommandRunner::customCmdList;
 
 void ConsoleCommandRunner::RunCommand(std::string command) {
@@ -70,7 +67,7 @@ void ConsoleCommandRunner::RunCommand(std::string command) {
 	}
 }
 
-bool ConsoleCommandRunner::TryAddCustomCommand(const std::string & command) {
+bool ConsoleCommandRunner::TryRunCustomCommand(const std::string & command) {
 	std::vector<std::string> params = splitParams(command);
 	
 	if (params.empty()) {
@@ -88,53 +85,18 @@ bool ConsoleCommandRunner::TryAddCustomCommand(const std::string & command) {
 
 	auto itr = customCmdList.find(action);
 	if (itr != customCmdList.end()) {
-		// mutex is automatically released when scopeLock goes out of scope
-		std::lock_guard<std::mutex> scopeLock(customCmdQueueLock);
-
-		// customCmdQueueSemaphore++
-		if (ReleaseSemaphore(customCmdQueueSemaphore, 1, NULL)) {
-			customCmdQueue.push(params);
-		}
-
+		itr->second(params);
 		return true;
 	}
 
 	return false;
 }
 
-DWORD WINAPI ConsoleCommandRunner::CustomCommandThread(void* ctx) {
-	customCmdQueueSemaphore = CreateSemaphore(NULL, 0, kMaxCustomCmdQueueSize, NULL);
-
-	for (;;) {
-		// waiting for customCmdQueueSemaphore > 0, then customCmdQueueSemaphore--
-		WaitForSingleObject(customCmdQueueSemaphore, INFINITE);
-
-		// mutex is automatically released when scopeLock goes out of scope
-		std::lock_guard<std::mutex> scopeLock(customCmdQueueLock);
-
-		std::vector<std::string> params = customCmdQueue.front();
-		customCmdQueue.pop();
-
-		if (params.size() == 0) {
-			continue;
-		}
-
-		auto itr = customCmdList.find(params[0]);
-		if (itr != customCmdList.end()) {
-			itr->second(params);
-		}
-	}
-}
-
-void ConsoleCommandRunner::Initialize() {
+void ConsoleCommandRunner::RegisterCustomCommands() {
 	// Register custom commands
 	customCmdList["press"] = CustomCommandPress;
-
-	// Start a thread that runs custom commands
-	CreateThread(NULL, 0, ConsoleCommandRunner::CustomCommandThread, NULL, 0L, NULL);
+	customCmdList["sleep"] = CustomCommandSleep;
 }
-
-
 
 void ConsoleCommandRunner::CustomCommandPress(std::vector<std::string> params) {
 	std::vector<UInt32 /*key*/> keyDown;
@@ -203,5 +165,27 @@ void ConsoleCommandRunner::CustomCommandPress(std::vector<std::string> params) {
 
 			SendInput(1, &input, sizeof(INPUT));
 		}
+	}
+}
+
+void ConsoleCommandRunner::CustomCommandSleep(std::vector<std::string> params) {
+	if (params.size() < 2) {
+		return;
+	}
+
+	std::string &time = params[1];
+	time_t millisecond = 0;
+
+	if (time.size() > 2 && time[0] == '0' && (time[1] == 'x' || time[1] == 'X')) {
+		// hex
+		millisecond = strtol(time.substr(2).c_str(), NULL, 16);
+	}
+	else if ('0' <= time[0] && time[0] <= '9') {
+		// dec
+		millisecond = strtol(time.c_str(), NULL, 10);
+	}
+
+	if (millisecond > 0) {
+		Sleep(millisecond);
 	}
 }

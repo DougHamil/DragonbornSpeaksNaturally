@@ -140,33 +140,35 @@ void ConsoleCommandRunner::CustomCommandPress(std::vector<std::string> params) {
 			time++;
 		}
 		keyUp[time] = key;
+	}
 
-		// send KEY_DOWN
-		for (auto itr = keyDown.begin(); itr != keyDown.end(); itr++) {
-			INPUT input;
-			ZeroMemory(&input, sizeof(input));
-			input.type = INPUT_KEYBOARD;
-			input.ki.dwFlags = KEYEVENTF_SCANCODE;
-			input.ki.wScan = *itr;
+	// send KEY_DOWN
+	for (auto itr = keyDown.begin(); itr != keyDown.end(); itr++) {
+		INPUT input;
+		ZeroMemory(&input, sizeof(input));
+		input.type = INPUT_KEYBOARD;
+		input.ki.dwFlags = KEYEVENTF_SCANCODE;
+		input.ki.wScan = *itr;
 
-			SendInput(1, &input, sizeof(INPUT));
-		}
+		SendInput(1, &input, sizeof(INPUT));
+		Log::info("key down: " + std::to_string(*itr));
+	}
 
-		// send KEY_UP
-		int totalSleepTime = 0;
-		for (auto itr = keyUp.begin(); itr != keyUp.end(); itr++) {
-			int sleepTime = (*itr).first - totalSleepTime;
-			Sleep(sleepTime);
-			totalSleepTime += sleepTime;
+	// send KEY_UP
+	int totalSleepTime = 0;
+	for (auto itr = keyUp.begin(); itr != keyUp.end(); itr++) {
+		int sleepTime = (*itr).first - totalSleepTime;
+		Sleep(sleepTime);
+		totalSleepTime += sleepTime;
 
-			INPUT input;
-			ZeroMemory(&input, sizeof(input));
-			input.type = INPUT_KEYBOARD;
-			input.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
-			input.ki.wScan = (*itr).second;
+		INPUT input;
+		ZeroMemory(&input, sizeof(input));
+		input.type = INPUT_KEYBOARD;
+		input.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
+		input.ki.wScan = itr->second;
 
-			SendInput(1, &input, sizeof(INPUT));
-		}
+		SendInput(1, &input, sizeof(INPUT));
+		Log::info("key up: " + std::to_string(itr->second));
 	}
 }
 

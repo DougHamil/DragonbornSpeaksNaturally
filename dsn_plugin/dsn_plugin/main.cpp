@@ -44,7 +44,7 @@ extern "C"	{
 			Hooks_Inject();
 
 			SpeechRecognitionClient::Initialize();
-			ConsoleCommandRunner::Initialize();
+			ConsoleCommandRunner::RegisterCustomCommands();
 
 			break;
 

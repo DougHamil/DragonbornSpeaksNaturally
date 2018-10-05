@@ -3,6 +3,7 @@
 #include "skse64/GameTypes.h"
 #include "DSNMenuManager.h"
 #include "KeyCode.hpp"
+#include "WindowUtils.hpp"
 #include "Log.h"
 
 #include <sstream>
@@ -96,6 +97,7 @@ void ConsoleCommandRunner::RegisterCustomCommands() {
 	// Register custom commands
 	customCmdList["press"] = CustomCommandPress;
 	customCmdList["sleep"] = CustomCommandSleep;
+	customCmdList["activewindow"] = CustomCommandActiveWindow;
 }
 
 void ConsoleCommandRunner::CustomCommandPress(std::vector<std::string> params) {
@@ -187,5 +189,44 @@ void ConsoleCommandRunner::CustomCommandSleep(std::vector<std::string> params) {
 
 	if (millisecond > 0) {
 		Sleep(millisecond);
+	}
+}
+
+void ConsoleCommandRunner::CustomCommandActiveWindow(std::vector<std::string> params) {
+	HWND window = NULL;
+	DWORD pid = 0;
+	std::string windowTitle;
+
+	if (params.size() < 2) {
+		pid = GetCurrentProcessId();
+	}
+	else {
+		windowTitle = params[1];
+		for (size_t i = 2; i < params.size(); i++) {
+			windowTitle += ' ';
+			windowTitle += params[i];
+		}
+		Log::info("title: " + windowTitle);
+
+		pid = GetProcessIDByName(windowTitle.c_str());
+	}
+
+	if (pid != 0) {
+		window = FindMainWindow(pid);
+		Log::info("pid: "+std::to_string(pid) + ", window: " + std::to_string((uint64_t)window));
+	}
+
+	if (window == NULL && !windowTitle.empty()) {
+		window = FindWindow(NULL, windowTitle.c_str());
+		Log::info("window: " + std::to_string((uint64_t)window));
+
+		if (window == NULL) {
+			window = FindWindow(windowTitle.c_str(), NULL);
+			Log::info("window: " + std::to_string((uint64_t)window));
+		}
+	}
+
+	if (window != NULL) {
+		SwitchToThisWindow(window, true);
 	}
 }

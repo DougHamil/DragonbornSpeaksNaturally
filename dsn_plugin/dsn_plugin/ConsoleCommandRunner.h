@@ -55,4 +55,18 @@ public:
 	//     Casting two dragon shouts one after another:
 	//         player.cast 0003f9ed player voice; sleep 3000; player.cast 00013f3a player voice
 	static void CustomCommandSleep(std::vector<std::string> params);
+
+	// Add a new command: activewindow [window title|executable name]
+	// 
+	// Description: Activate the specified window.
+	//              Used to switch to the correct window before running the press command.
+	//              Omitting the parameters will activate the current Skyrim window.
+	// 
+	// Example:
+	//         activewindow
+	//         activewindow Notepad++
+	//         activewindow notepad.exe
+	//     Activate the Skyrim window and type in the console:
+	//         activewindow; sleep 50; press a 10 e 10 i 10 o 10 u 10
+	static void CustomCommandActiveWindow(std::vector<std::string> params);
 };

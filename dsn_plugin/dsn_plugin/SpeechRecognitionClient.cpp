@@ -92,12 +92,9 @@ std::string SpeechRecognitionClient::PopEquip() {
 }
 
 void SpeechRecognitionClient::EnqueueCommand(std::string command) {
-	if (ConsoleCommandRunner::TryAddCustomCommand(command)) {
-		// Custom commands will be added to a separate queue and run by a separate thread.
-		// Adding is finished when TryAddCustomCommand() returns true.
-		// Custom commands will not run in the game thread because the main loop of the game will be paused
-		// when the menu pops up or the map opens.
-		// For the same reason, custom commands cannot be added to the queue of console commands.
+	// The custom command will be executed on the current thread,
+	// and the Skyrim command will be executed in the game thread.
+	if (ConsoleCommandRunner::TryRunCustomCommand(command)) {
 		return;
 	}
 	queueLock.lock();

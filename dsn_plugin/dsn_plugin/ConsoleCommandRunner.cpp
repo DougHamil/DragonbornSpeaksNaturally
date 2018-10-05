@@ -151,7 +151,7 @@ void ConsoleCommandRunner::CustomCommandPress(std::vector<std::string> params) {
 		input.ki.wScan = *itr;
 
 		SendInput(1, &input, sizeof(INPUT));
-		Log::info("key down: " + std::to_string(*itr));
+		//Log::info("key down: " + std::to_string(*itr));
 	}
 
 	// send KEY_UP
@@ -168,7 +168,7 @@ void ConsoleCommandRunner::CustomCommandPress(std::vector<std::string> params) {
 		input.ki.wScan = itr->second;
 
 		SendInput(1, &input, sizeof(INPUT));
-		Log::info("key up: " + std::to_string(itr->second));
+		//Log::info("key up: " + std::to_string(itr->second));
 	}
 }
 
@@ -208,27 +208,30 @@ void ConsoleCommandRunner::CustomCommandActiveWindow(std::vector<std::string> pa
 			windowTitle += ' ';
 			windowTitle += params[i];
 		}
-		Log::info("title: " + windowTitle);
+		//Log::info("title: " + windowTitle);
 
 		pid = GetProcessIDByName(windowTitle.c_str());
 	}
 
 	if (pid != 0) {
 		window = FindMainWindow(pid);
-		Log::info("pid: "+std::to_string(pid) + ", window: " + std::to_string((uint64_t)window));
+		//Log::info("pid: "+std::to_string(pid) + ", window: " + std::to_string((uint64_t)window));
 	}
 
 	if (window == NULL && !windowTitle.empty()) {
 		window = FindWindow(NULL, windowTitle.c_str());
-		Log::info("window: " + std::to_string((uint64_t)window));
+		//Log::info("window: " + std::to_string((uint64_t)window));
 
 		if (window == NULL) {
 			window = FindWindow(windowTitle.c_str(), NULL);
-			Log::info("window: " + std::to_string((uint64_t)window));
+			//Log::info("window: " + std::to_string((uint64_t)window));
 		}
 	}
 
 	if (window != NULL) {
 		SwitchToThisWindow(window, true);
+	}
+	else {
+		Log::info("Cannot find windows with title/executable: " + windowTitle);
 	}
 }

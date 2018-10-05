@@ -1,7 +1,8 @@
 #include "ConsoleCommandRunner.h"
 #include "skse64/GameMenus.h"
-#include "DSNMenuManager.h"
 #include "skse64/GameTypes.h"
+#include "DSNMenuManager.h"
+#include "KeyCode.hpp"
 #include "Log.h"
 
 #include <sstream>
@@ -36,11 +37,6 @@ HANDLE ConsoleCommandRunner::customCmdQueueSemaphore;
 std::queue<std::vector<std::string>> ConsoleCommandRunner::customCmdQueue;
 
 void ConsoleCommandRunner::RunCommand(std::string command) {
-
-	if (TryRunCustomCommand(command)) {
-		return;
-	}
-
 	if (!consoleMenu) {
 		Log::info("Trying to create Console menu");
 		consoleMenu = DSNMenuManager::GetOrCreateMenu("Console");
@@ -73,7 +69,7 @@ void ConsoleCommandRunner::RunCommand(std::string command) {
 	}
 }
 
-bool ConsoleCommandRunner::TryRunCustomCommand(const std::string & command) {
+bool ConsoleCommandRunner::TryAddCustomCommand(const std::string & command) {
 	std::vector<std::string> params = splitParams(command);
 	
 	if (params.empty()) {
@@ -87,7 +83,7 @@ bool ConsoleCommandRunner::TryRunCustomCommand(const std::string & command) {
 			action[i] += 'a' - 'A';
 		}
 	}
-	Log::info(std::string("action: ") + action);
+	//Log::info(std::string("action: ") + action);
 
 	if (action == "press") {
 		// mutex is automatically released when scopeLock goes out of scope
@@ -104,7 +100,7 @@ bool ConsoleCommandRunner::TryRunCustomCommand(const std::string & command) {
 	return false;
 }
 
-DWORD WINAPI ConsoleCommandRunner::RunCustomCommandThread(void* ctx) {
+DWORD WINAPI ConsoleCommandRunner::CustomCommandThread(void* ctx) {
 	customCmdQueueSemaphore = CreateSemaphore(NULL, 0, kMaxCustomCmdQueueSize, NULL);
 
 	for (;;) {
@@ -124,48 +120,39 @@ DWORD WINAPI ConsoleCommandRunner::RunCustomCommandThread(void* ctx) {
 }
 
 void ConsoleCommandRunner::Initialize() {
-	CreateThread(NULL, 0, ConsoleCommandRunner::RunCustomCommandThread, NULL, 0L, NULL);
+	CreateThread(NULL, 0, ConsoleCommandRunner::CustomCommandThread, NULL, 0L, NULL);
 }
 
-void ConsoleCommandRunner::RunCustomCommandPress(const std::vector<std::string>& params) {
-	std::vector<int /*key*/> keyDown;
-	std::map<int /*time*/, int /*key*/> keyUp;
+
+
+void ConsoleCommandRunner::RunCustomCommandPress(std::vector<std::string> params) {
+	std::vector<UInt32 /*key*/> keyDown;
+	std::map<UInt32 /*time*/, UInt32 /*key*/> keyUp;
+
+	// If time does not exist, set as 50 milliseconds
+	if ((params.size() - 1) % 2 > 0) {
+		params.push_back("50");
+	}
 
 	// command: press <key> <time> <key> <time> ...
 	//           [0]   [1]   [2]    [3]   [4]
 	for (size_t i = 1; i + 1 < params.size(); i += 2) {
 		const std::string &keyStr = params[i];
 		const std::string &timeStr = params[i + 1];
-		int key = 0;
-		int time = 0;
+		UInt32 key = 0;
+		UInt32 time = 0;
 
 		if (keyStr.empty()) {
 			continue;
 		}
 
-		if (keyStr.size() > 2 && keyStr[0] == '0' && (keyStr[1] == 'x' || keyStr[1] == 'X')) {
-			// key code hex
-			key = strtol(keyStr.substr(2).c_str(), NULL, 16);
-		}
-		else if ('0' <= keyStr[0] && keyStr[0] <= '9') {
-			// key code dec
-			key = strtol(keyStr.c_str(), NULL, 10);
-		}
-		/*else if ('A' <= keyStr[0] && keyStr[0] <= 'Z') {
-			// character
-			key = (int)keyStr[0];
-		}
-		else if ('a' <= keyStr[0] && keyStr[0] <= 'z') {
-			// lower character, to upper
-			key = (int)(keyStr[0] - ('a' - 'A'));
-		}*/
-		else {
+		key = GetKeyScanCode(keyStr);
+		if (key == 0) {
 			continue;
 		}
 
 		time = strtol(timeStr.c_str(), NULL, 10);
-
-		if (time <= 0) {
+		if (time == 0) {
 			continue;
 		}
 

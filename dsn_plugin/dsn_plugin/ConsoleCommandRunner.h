@@ -10,27 +10,36 @@
 class ConsoleCommandRunner
 {
 private:
-	static const int kMaxCustomCmdQueueSize = 1000;
+	static const size_t kMaxCustomCmdQueueSize = 1000;
 
 	static std::mutex customCmdQueueLock;
 	static HANDLE customCmdQueueSemaphore;
 	static std::queue<std::vector<std::string>> customCmdQueue;
 
 public:
+	// Run a Skyrim console command
 	static void RunCommand(std::string command);
-	static bool TryRunCustomCommand(const std::string &command);
-	static DWORD WINAPI RunCustomCommandThread(void* ctx);
+
+	// Try adding a custom command to a separate custom command queue.
+	// Returns true if the addition was successful.
+	// Returns false if the command is not a custom command and the caller
+	// should add the command to another queue.
+	static bool TryAddCustomCommand(const std::string &command);
+	// a separate thread to run custom commands
+	static DWORD WINAPI CustomCommandThread(void* ctx);
+	// Start the thread that runs custom commands
 	static void Initialize();
 
-	// Add a new command: press <character or VirtualKeyCode> <millisecond>
-	// Windows Virtual-Key Codes: https://msdn.microsoft.com/en-us/library/dd375731(VS.85).aspx
-	//           Example: press    Z 1000
-	//                    press  127 1000
-	//                    press 0x58 1000
-	//               Press 4 keys at the same time:
-	//                    press   a 1000   127 500   z 1000   0x58 3000
+	// Add a new command: press <key name or DirectInput Scan Code> [millisecond]
+	// Windows Virtual-Key Codes: https://www.creationkit.com/index.php?title=Input_Script#DXScanCodes
+	//         Example: press m
+	//                  press Z 1000
+	//                  press 44 50
+	//                  press 0x2C 100
+	//                  press esc
+	//         Press 3 keys at the same time (ctrl + alt + a):
+	//                  press  ctrl 500  alt 500  a 400
 	// Description: Simulate pressing the specified key the specified milliseconds.
 	//              Used to cast skills or dragon shouts or do other actions.
-	static void RunCustomCommandPress(const std::vector<std::string> &params);
+	static void RunCustomCommandPress(std::vector<std::string> params);
 };
-

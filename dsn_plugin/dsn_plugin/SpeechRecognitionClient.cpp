@@ -1,4 +1,5 @@
 #include "SpeechRecognitionClient.h"
+#include "ConsoleCommandRunner.h"
 #include "Log.h"
 #include <io.h>
 #include <fcntl.h>
@@ -91,6 +92,14 @@ std::string SpeechRecognitionClient::PopEquip() {
 }
 
 void SpeechRecognitionClient::EnqueueCommand(std::string command) {
+	if (ConsoleCommandRunner::TryAddCustomCommand(command)) {
+		// Custom commands will be added to a separate queue and run by a separate thread.
+		// Adding is finished when TryAddCustomCommand() returns true.
+		// Custom commands will not run in the game thread because the main loop of the game will be paused
+		// when the menu pops up or the map opens.
+		// For the same reason, custom commands cannot be added to the queue of console commands.
+		return;
+	}
 	queueLock.lock();
 	queuedCommands.push(command);
 	queueLock.unlock();

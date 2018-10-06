@@ -4,34 +4,13 @@
 #include "DSNMenuManager.h"
 #include "KeyCode.hpp"
 #include "WindowUtils.hpp"
+#include "StringUtils.hpp"
 #include "Log.h"
 
-#include <sstream>
 #include <algorithm>
 #include <map>
 
 static IMenu* consoleMenu = NULL;
-
-std::vector<std::string> splitParams(std::string s) {
-	for (size_t i = 0; i<s.size(); i++) {
-		// replace blank characters to space
-		if (s[i] == '\t' || s[i] == '\n' || s[i] == '\r' ||
-			s[i] == '\0' || s[i] == '\x0B') {
-			s[i] = ' ';
-		}
-	}
-
-	std::stringstream ss(s);
-	std::string item;
-	std::vector<std::string> tokens;
-	while (std::getline(ss, item, ' ')) {
-		if (item.empty()) {
-			continue;
-		}
-		tokens.push_back(item);
-	}
-	return tokens;
-}
 
 std::unordered_map<std::string/* name */, std::function<void(std::vector<std::string>)>/* func */> ConsoleCommandRunner::customCmdList;
 
@@ -76,12 +55,7 @@ bool ConsoleCommandRunner::TryRunCustomCommand(const std::string & command) {
 	}
 	
 	std::string action = params[0];
-	// to lower
-	for (size_t i = 0; i < action.size(); i++) {
-		if ('A' <= action[i] && action[i] <= 'Z') {
-			action[i] += 'a' - 'A';
-		}
-	}
+	stringToLower(action);
 	//Log::info(std::string("action: ") + action);
 
 	auto itr = customCmdList.find(action);
@@ -96,17 +70,20 @@ bool ConsoleCommandRunner::TryRunCustomCommand(const std::string & command) {
 void ConsoleCommandRunner::RegisterCustomCommands() {
 	// Register custom commands
 	customCmdList["press"] = CustomCommandPress;
+	customCmdList["tapkey"] = CustomCommandTapKey;
+	customCmdList["holdkey"] = CustomCommandHoldKey;
+	customCmdList["releasekey"] = CustomCommandReleaseKey;
 	customCmdList["sleep"] = CustomCommandSleep;
-	customCmdList["activewindow"] = CustomCommandActiveWindow;
+	customCmdList["switchwindow"] = CustomCommandSwitchWindow;
 }
 
 void ConsoleCommandRunner::CustomCommandPress(std::vector<std::string> params) {
 	std::vector<UInt32 /*key*/> keyDown;
 	std::map<UInt32 /*time*/, UInt32 /*key*/> keyUp;
 
-	// If time does not exist, set as 50 milliseconds
+	// If time does not exist, set as kDefaultKeyPressTime milliseconds
 	if ((params.size() - 1) % 2 > 0) {
-		params.push_back("50");
+		params.push_back(std::to_string(kDefaultKeyPressTime));
 	}
 
 	// command: press <key> <time> <key> <time> ...
@@ -144,31 +121,44 @@ void ConsoleCommandRunner::CustomCommandPress(std::vector<std::string> params) {
 
 	// send KEY_DOWN
 	for (auto itr = keyDown.begin(); itr != keyDown.end(); itr++) {
-		INPUT input;
-		ZeroMemory(&input, sizeof(input));
-		input.type = INPUT_KEYBOARD;
-		input.ki.dwFlags = KEYEVENTF_SCANCODE;
-		input.ki.wScan = *itr;
-
-		SendInput(1, &input, sizeof(INPUT));
-		//Log::info("key down: " + std::to_string(*itr));
+		SendKeyDown(*itr);
 	}
 
 	// send KEY_UP
 	int totalSleepTime = 0;
 	for (auto itr = keyUp.begin(); itr != keyUp.end(); itr++) {
-		int sleepTime = (*itr).first - totalSleepTime;
+		int sleepTime = itr->first - totalSleepTime;
 		Sleep(sleepTime);
 		totalSleepTime += sleepTime;
 
-		INPUT input;
-		ZeroMemory(&input, sizeof(input));
-		input.type = INPUT_KEYBOARD;
-		input.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
-		input.ki.wScan = itr->second;
+		SendKeyUp(itr->second);
+	}
+}
 
-		SendInput(1, &input, sizeof(INPUT));
-		//Log::info("key up: " + std::to_string(itr->second));
+void ConsoleCommandRunner::CustomCommandTapKey(std::vector<std::string> params) {
+	std::vector<std::string> newParams = { "press" };
+	for (auto itr = ++params.begin(); itr != params.end(); itr++) {
+		newParams.push_back(*itr);
+		newParams.push_back(std::to_string(kDefaultKeyPressTime));
+	}
+	CustomCommandPress(newParams);
+}
+
+void ConsoleCommandRunner::CustomCommandHoldKey(std::vector<std::string> params) {
+	for (auto itr = ++params.begin(); itr != params.end(); itr++) {
+		UInt32 key = GetKeyScanCode(*itr);
+		if (key != 0) {
+			SendKeyDown(key);
+		}
+	}
+}
+
+void ConsoleCommandRunner::CustomCommandReleaseKey(std::vector<std::string> params) {
+	for (auto itr = ++params.begin(); itr != params.end(); itr++) {
+		UInt32 key = GetKeyScanCode(*itr);
+		if (key != 0) {
+			SendKeyUp(key);
+		}
 	}
 }
 
@@ -194,7 +184,7 @@ void ConsoleCommandRunner::CustomCommandSleep(std::vector<std::string> params) {
 	}
 }
 
-void ConsoleCommandRunner::CustomCommandActiveWindow(std::vector<std::string> params) {
+void ConsoleCommandRunner::CustomCommandSwitchWindow(std::vector<std::string> params) {
 	HWND window = NULL;
 	DWORD pid = 0;
 	std::string windowTitle;

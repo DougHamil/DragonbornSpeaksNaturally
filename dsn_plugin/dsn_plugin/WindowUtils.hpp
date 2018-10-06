@@ -1,3 +1,4 @@
+#pragma once
 #include <Windows.h>
 #include <tlhelp32.h>
 
@@ -26,7 +27,7 @@ static BOOL CALLBACK _enumWindowsCallback(HWND handle, LPARAM lParam)
 	return FALSE;
 }
 
-HWND FindMainWindow(unsigned long process_id)
+static HWND FindMainWindow(unsigned long process_id)
 {
 	handle_data data;
 	data.process_id = process_id;
@@ -37,7 +38,7 @@ HWND FindMainWindow(unsigned long process_id)
 
 // Get the process id by the executable name
 // Copied from <https ://blog.csdn.net/hubinbin595959/article/details/77839945?utm_source=copy>
-DWORD GetProcessIDByName(const char* pName)
+static DWORD GetProcessIDByName(const char* pName)
 {
 	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (INVALID_HANDLE_VALUE == hSnapshot) {

@@ -5,12 +5,16 @@
 #include "skse64_common/SafeWrite.h"
 #include "skse64/ScaleformMovie.h"
 #include "skse64/ScaleformValue.h"
+#include "skse64/GameInput.h"
 #include "skse64_common/BranchTrampoline.h"
 #include "xbyak.h"
 #include "SkyrimType.h"
 #include "ConsoleCommandRunner.h"
 #include "FavoritesMenuManager.h"
 
+class RunCommandSink;
+
+static RunCommandSink *runCommandSink = NULL;
 static GFxMovieView* dialogueMenu = NULL;
 static int desiredTopicIndex = 1;
 static int numTopics = 0;
@@ -57,6 +61,24 @@ static void __cdecl Hook_PostLoad() {
 	}
 }
 
+static void runCommand() {
+	std::string command = SpeechRecognitionClient::getInstance()->PopCommand();
+	if (command != "") {
+		ConsoleCommandRunner::RunCommand(command);
+		Log::info("run command: " + command);
+	}
+
+	if (g_SkyrimType == VR)
+		FavoritesMenuManager::getInstance()->ProcessEquipCommands();
+}
+
+class RunCommandSink : public BSTEventSink<InputEvent> {
+	EventResult ReceiveEvent(InputEvent ** evnArr, InputEventDispatcher * dispatcher) override {
+		runCommand();
+		return kEvent_Continue;
+	}
+};
+
 static void __cdecl Hook_Loop()
 {
 	if (dialogueMenu != NULL)
@@ -100,13 +122,23 @@ static void __cdecl Hook_Loop()
 	}
 	else
 	{
-		std::string command = SpeechRecognitionClient::getInstance()->PopCommand();
-		if (command != "") {
-			ConsoleCommandRunner::RunCommand(command);
+		if (g_SkyrimType == VR) {
+			runCommand();
 		}
-
-		if (g_SkyrimType == VR)
-			FavoritesMenuManager::getInstance()->ProcessEquipCommands();
+		else {
+			// The latest version of SkyrimSE will not enter the loop if no menu is displayed.
+			// So we use InputEventSink to get a continuous running loop.
+			static bool inited = false;
+			if (!inited) {
+				Log::info("RunCommandSink Initialized");
+				runCommandSink = new RunCommandSink;
+				// Currently in the source code directory is the latest version of SKSE64 instead of SKSEVR,
+				// so we can call GetSingleton() directly instead of use a RelocAddr.
+				auto inputEventDispatcher = InputEventDispatcher::GetSingleton();
+				inputEventDispatcher->AddEventSink(runCommandSink);
+				inited = true;
+			}
+		}
 	}
 }
 

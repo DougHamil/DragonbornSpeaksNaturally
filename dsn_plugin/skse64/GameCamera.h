@@ -260,7 +260,7 @@ public:
 	UInt8		pad31[7];		// 31
 
 	MEMBER_FN_PREFIX(TESCamera);
-	DEFINE_MEMBER_FN(SetCameraState, UInt32, 0x00505F60, TESCameraState * cameraState);
+	DEFINE_MEMBER_FN(SetCameraState, UInt32, 0x004F5E70, TESCameraState * cameraState);
 };
 STATIC_ASSERT(offsetof(TESCamera, cameraNode) == 0x20);
 STATIC_ASSERT(sizeof(TESCamera) == 0x38);
@@ -297,8 +297,8 @@ public:
 	void SetDefaultStateBounds(float x, float y, float z);
 
 	MEMBER_FN_PREFIX(LocalMapCamera);
-	DEFINE_MEMBER_FN(ctor, void, 0x00205EF0);
-	DEFINE_MEMBER_FN(SetNorthRotation, void, 0x002062B0, float northRotation);
+	DEFINE_MEMBER_FN(ctor, void, 0x001F5580);
+	DEFINE_MEMBER_FN(SetNorthRotation, void, 0x001F5940, float northRotation);
 };
 
 STATIC_ASSERT(offsetof(LocalMapCamera, northRotation) == 0x60);
@@ -340,7 +340,7 @@ public:
 	static PlayerCamera *	GetSingleton(void)
 	{
 		// 0FAF5D3C755F11266ECC496FD392A0A2EA23403B+37
-		static RelocPtr<PlayerCamera*> g_playerCamera(0x02F8A888);
+		static RelocPtr<PlayerCamera*> g_playerCamera(0x02EEC9B8);
 		return *g_playerCamera;
 	}
 
@@ -380,7 +380,7 @@ public:
 	UInt8	pad166[2];									// 166
 
 	MEMBER_FN_PREFIX(PlayerCamera);
-	DEFINE_MEMBER_FN(UpdateThirdPerson, void, 0x00877DB0, bool weaponDrawn);
+	DEFINE_MEMBER_FN(UpdateThirdPerson, void, 0x0084D820, bool weaponDrawn);
 };
 
 STATIC_ASSERT(offsetof(PlayerCamera, cameraStates) == 0xB8);

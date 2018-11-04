@@ -59,7 +59,7 @@ public:
 	Entry	items;	// 118
 
 	MEMBER_FN_PREFIX(SettingCollectionList);
-	DEFINE_MEMBER_FN(Get_Internal, Setting *, 0x003219E0, const char * name);
+	DEFINE_MEMBER_FN(Get_Internal, Setting *, 0x003106C0, const char * name);
 
 	Setting	*	Get(const char * name);
 };
@@ -86,3 +86,4 @@ extern RelocPtr<SettingCollectionList*> g_iniPrefSettingCollection;
 extern RelocPtr<SettingCollectionMap*>  g_gameSettingCollection;
 
 extern RelocPtr<float> g_mapLocalHeight;
+extern RelocPtr<float> g_localMapMinFrustumWidth;

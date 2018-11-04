@@ -12,7 +12,7 @@
 
 namespace Serialization
 {
-	const char * kSavegamePath = "\\My Games\\Skyrim VR\\";
+	const char * kSavegamePath = "\\My Games\\Skyrim Special Edition\\";
 
 	// file format internals
 

@@ -78,6 +78,8 @@ void SimpleLock::Release(void)
 	}
 }
 
+/*** using runtime internal implementation rather than our reimplementation so it can be hooked by other plugins
+
 void BSReadWriteLock::LockForRead()
 {
 	SInt32 myThreadID = GetCurrentThreadId();
@@ -213,7 +215,7 @@ void BSReadWriteLock::Unlock()
 	{
 		InterlockedDecrement(&lockValue);
 	}
-}
+}*/
 
 void UpdateRegistrationHolder::Order(UInt32 index)
 {

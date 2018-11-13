@@ -192,8 +192,11 @@ static std::vector<std::string> split(const std::string &s, char delim) {
 EquipItem parseEquipItem(std::string command) {
 	std::vector<std::string> tokens = split(command, ';');
 
+	char* formId = (char*)tokens[0].c_str();
+	char* end = formId + strlen(formId);
+
 	EquipItem item = {
-		(UInt32)std::atoi(tokens[0].c_str()),
+		(UInt32)std::strtoul(formId, &end, 10),
 		(SInt32)std::atoi(tokens[1].c_str()),
 		(UInt8)std::atoi(tokens[2].c_str()),
 		(SInt32)std::atoi(tokens[3].c_str())

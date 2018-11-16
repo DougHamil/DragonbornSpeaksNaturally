@@ -147,9 +147,9 @@ namespace DSN {
         public string GetCommandForResult(RecognitionResult result) {
             var handednessMap = new Dictionary<string, string>
             {
-                { "both", "0" },
-                { "right", "1" },
-                { "left", "2" },
+                { bothHandsSuffix, "0" },
+                { rightHandSuffix, "1" },
+                { leftHandSuffix, "2" },
             };
 
             Grammar grammar = result.Grammar;

@@ -68,8 +68,9 @@ static void runCommand() {
 		Log::info("run command: " + command);
 	}
 
-	if (g_SkyrimType == VR)
+	if (g_SkyrimType == VR) {
 		FavoritesMenuManager::getInstance()->ProcessEquipCommands();
+	}
 }
 
 class RunCommandSink : public BSTEventSink<InputEvent> {
@@ -99,7 +100,11 @@ static void __cdecl Hook_Loop()
 			lastMenuState = menuState;
 			if (menuState == 2) // NPC Responding
 			{
+				// fix issue #11 (SSE crash when teleport with a dialogue line).
+				// It seems no side effects have been found at present.
+				dialogueMenu = NULL;
 				SpeechRecognitionClient::getInstance()->StopDialogue();
+				return;
 			}
 		}
 		if (desiredTopicIndex >= 0) {

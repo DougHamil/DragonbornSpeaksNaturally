@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -233,9 +233,6 @@ xcopy /y "$(OutDir)$(TargetFileName)" "D:\SteamLibrary\steamapps\common\SkyrimVR
     <None Include="exports.def" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="HowToFind.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\common\common_vc14.vcxproj">
       <Project>{472e19ab-def0-42df-819b-18722e8dc822}</Project>
     </ProjectReference>
@@ -245,6 +242,9 @@ xcopy /y "$(OutDir)$(TargetFileName)" "D:\SteamLibrary\steamapps\common\SkyrimVR
     <ProjectReference Include="..\skse64_common\skse64_common.vcxproj">
       <Project>{5fd1c08d-db80-480c-a1c6-f0920005cd13}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReversingNotes.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

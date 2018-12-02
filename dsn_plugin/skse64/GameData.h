@@ -37,7 +37,6 @@ class NiTexture;
 class NiAVObject;
 class NiColorA;
 
-extern RelocAddr <UInt32*> g_gameTime;
 
 struct FormRecordData
 {
@@ -141,16 +140,17 @@ STATIC_ASSERT(offsetof(ModInfo, numRefMods) == 0x460);
 STATIC_ASSERT(offsetof(ModInfo, author) == 0x480);
 STATIC_ASSERT(sizeof(ModInfo) == 0x4C8);
 
-// 40 - updated in 1.5.3
+// 810
 struct ModList
 {
-	tList<ModInfo>		modInfoList;		// 00 - DataHandler D60
-	tArray<ModInfo *>	loadedMods;			// 10 - DataHandler D70
-	tArray<ModInfo *>	loadedCCMods;		// 28 - DataHandler D88 - just assuming this is for CC
+	tList<ModInfo>		modInfoList;		// 00	- DataHandler D60
+	UInt32				loadedModCount;		// 10	- DataHandler D70
+	UInt32				pad14;				// 14	- DataHandler D74
+	ModInfo*			loadedMods[0xFF];	// 18	- Datahandler D78
 };
-STATIC_ASSERT(sizeof(ModList) == 0x40);
+STATIC_ASSERT(sizeof(ModList) == 0x810);
 
-// DC0
+// 1590
 class DataHandler
 {
 public:
@@ -307,43 +307,43 @@ public:
 	UInt64								unkD58;			// D58
 	ModList								modList;		// D60
 
-	UInt8								unkDA0;		// DA0
-	UInt8								unkDA1;		// DA1
-	UInt8								unkDA2;		// DA2
-	UInt8								unkDA3;		// DA3
-	UInt8								unkDA4;		// DA4
-	UInt8								unkDA5;		// DA5
-	UInt8								unkDA6;		// DA6
-	UInt8								unkDA7;		// DA7
-	UInt8								unkDA8;		// DA8
-	UInt8								unkDA9;		// DA9
-	UInt8								unkDAA;		// DAA
-	UInt8								padDAB[5];	// DAB
+	UInt8								unk1570;		// 1570
+	UInt8								unk1571;		// 1571
+	UInt8								unk1572;		// 1572
+	UInt8								unk1573;		// 1573
+	UInt8								unk1574;		// 1574
+	UInt8								unk1575;		// 1575
+	UInt8								unk1576;		// 1576 - init'd to 1
+	UInt8								unk1577;		// 1577
+	UInt8								unk1578;		// 1578
+	UInt8								unk1579;		// 1579
+	UInt8								unk157A;		// 157A
+	UInt8								pad157B[5];		// 157B
 
-	void								* regionDataManager;	// DB0 - TESRegionDataManager*, allocated in ctor
-	UInt64								unkDB8;		// DB8
+	void								* regionDataManager;	// 1580 - TESRegionDataManager*, allocated in ctor
+	UInt64								unk1588;		// 1588
 
 	const ModInfo* LookupModByName(const char* modName);
-	SInt32 GetModIndex(const char* modName);
+	UInt8 GetModIndex(const char* modName);
 
 	const ModInfo* LookupLoadedModByName(const char* modName);
 	UInt8 GetLoadedModIndex(const char* modName);
 
 	const ModInfo* LookupLoadedLightModByName(const char* modName);
-	UInt16 GetLoadedLightModIndex(const char* modName);
+	UInt8 GetLoadedLightModIndex(const char* modName);
 
 	static DataHandler * GetSingleton();
 
 	UInt32 LoadScripts_Hook();
 
 	MEMBER_FN_PREFIX(DataHandler);
-	DEFINE_MEMBER_FN(LoadScripts, UInt32, 0x001715C0);
+	DEFINE_MEMBER_FN(LoadScripts, UInt32, 0x00181B80);
 };
 
 STATIC_ASSERT(offsetof(DataHandler, regionList) == 0xD00);
 STATIC_ASSERT(offsetof(DataHandler, addonNodes) == 0xD20);
 STATIC_ASSERT(offsetof(DataHandler, modList) == 0xD60);
-STATIC_ASSERT(sizeof(DataHandler) == 0xDC0);
+STATIC_ASSERT(sizeof(DataHandler) == 0x1590);
 
 extern RelocPtr <DataHandler*> g_dataHandler;
 extern RelocPtr <bool> g_isGameDataReady;
@@ -388,8 +388,8 @@ public:
 	static EquipManager *   GetSingleton(void);
 
 	MEMBER_FN_PREFIX(EquipManager);
-	DEFINE_MEMBER_FN(EquipItem, void, 0x00637C70, Actor * actor, TESForm * item, BaseExtraList * extraData, SInt32 count, BGSEquipSlot * equipSlot, bool withEquipSound, bool preventUnequip, bool showMsg, void * unk);
-	DEFINE_MEMBER_FN(UnequipItem, bool, 0x00638380, Actor * actor, TESForm * item, BaseExtraList * extraData, SInt32 count, BGSEquipSlot * equipSlot, bool unkFlag1, bool preventEquip, bool unkFlag2, bool unkFlag3, void * unk);
+	DEFINE_MEMBER_FN(EquipItem, void, 0x00640A90, Actor * actor, TESForm * item, BaseExtraList * extraData, SInt32 count, BGSEquipSlot * equipSlot, bool withEquipSound, bool preventUnequip, bool showMsg, void * unk);
+	DEFINE_MEMBER_FN(UnequipItem, bool, 0x006411A0, Actor * actor, TESForm * item, BaseExtraList * extraData, SInt32 count, BGSEquipSlot * equipSlot, bool unkFlag1, bool preventEquip, bool unkFlag2, bool unkFlag3, void * unk);
 };
 
 
@@ -469,8 +469,8 @@ public:
 	{
 	public:
 		MEMBER_FN_PREFIX(MorphDatabase);
-		DEFINE_MEMBER_FN(GetFaceGenModelMapEntry, bool, 0x003D5180, const char * meshPath, BSFaceGenModelMap ** entry);
-		DEFINE_MEMBER_FN(SetFaceGenModelMapEntry, void, 0x003D4F70, const char * meshPath, BSFaceGenModel * model);
+		DEFINE_MEMBER_FN(GetFaceGenModelMapEntry, bool, 0x003E4900, const char * meshPath, BSFaceGenModelMap ** entry);
+		DEFINE_MEMBER_FN(SetFaceGenModelMapEntry, void, 0x003E46F0, const char * meshPath, BSFaceGenModel * model);
 
 		UInt64	unk00;	// 00
 		UInt32	unk08;	// 08
@@ -505,8 +505,9 @@ public:
 	UInt8			pad61[7];					// 61
 
 	MEMBER_FN_PREFIX(FaceGen);
-	DEFINE_MEMBER_FN(RegenerateHead, void, 0x003D2C50, BSFaceGenNiNode * headNode, BGSHeadPart * head, TESNPC * npc);
-	DEFINE_MEMBER_FN(ApplyMorph, void, 0x003D2570, BSFaceGenNiNode * faceGenNode, BGSHeadPart * headPart, BSFixedString * morphName, float relative);
+	// C52C6ED9DF399194B498A8A095057B7939BA3932+95
+	DEFINE_MEMBER_FN(RegenerateHead, void, 0x003E23D0, BSFaceGenNiNode * headNode, BGSHeadPart * head, TESNPC * npc);
+	DEFINE_MEMBER_FN(ApplyMorph, void, 0x003E1CE0, BSFaceGenNiNode * faceGenNode, BGSHeadPart * headPart, BSFixedString * morphName, float relative);
 };
 STATIC_ASSERT(offsetof(FaceGen, isReset) == 0x58);
 
@@ -652,12 +653,12 @@ public:
 	}
 
 	MEMBER_FN_PREFIX(PersistentFormManager);
-	DEFINE_MEMBER_FN(CreateOffensiveEnchantment, EnchantmentItem *, 0x0059F2E0, tArray<MagicItem::EffectItem> * effectArray);
-	DEFINE_MEMBER_FN(CreateDefensiveEnchantment, EnchantmentItem *, 0x0059F380, tArray<MagicItem::EffectItem> * effectArray);
-	DEFINE_MEMBER_FN(CreatePoison, void, 0x0059F4D0, tArray<MagicItem::EffectItem> * effectArray, AlchemyItem ** poison);
-	DEFINE_MEMBER_FN(CreatePotion, void, 0x0059F420, AlchemyItem ** potion, tArray<MagicItem::EffectItem> * effectArray);
+	DEFINE_MEMBER_FN(CreateOffensiveEnchantment, EnchantmentItem *, 0x005A67B0, tArray<MagicItem::EffectItem> * effectArray);
+	DEFINE_MEMBER_FN(CreateDefensiveEnchantment, EnchantmentItem *, 0x005A6850, tArray<MagicItem::EffectItem> * effectArray);
+	DEFINE_MEMBER_FN(CreatePoison, void, 0x005A69A0, tArray<MagicItem::EffectItem> * effectArray, AlchemyItem ** poison);
+	DEFINE_MEMBER_FN(CreatePotion, void, 0x005A68F0, AlchemyItem ** potion, tArray<MagicItem::EffectItem> * effectArray);
 	//DEFINE_MEMBER_FN(AddPersistentForm, void, 0x0068A0F0, TESForm *);
-	DEFINE_MEMBER_FN(ScheduleForDeletion, void, 0x0059F8D0, TESForm *);
+	DEFINE_MEMBER_FN(ScheduleForDeletion, void, 0x005A6DA0, TESForm *);
 };
 STATIC_ASSERT(sizeof(PersistentFormManager) == 0xD0);
 
@@ -842,14 +843,14 @@ public:
 	
 	private:
 	// SE: Save_Internal signature changed! Normal save: unk1=2, unk2=0
-	DEFINE_MEMBER_FN(Save_Internal, bool, 0x00586FD0, int unk1, UInt32 unk2, const char * name);
-	DEFINE_MEMBER_FN(Load_Internal, bool, 0x00587540, const char * name, int unk1, UInt32 unk2, UInt32 unk3);
+	DEFINE_MEMBER_FN(Save_Internal, bool, 0x0058E310, int unk1, UInt32 unk2, const char * name);
+	DEFINE_MEMBER_FN(Load_Internal, bool, 0x0058E920, const char * name, int unk1, UInt32 unk2, UInt32 unk3);
 
-	DEFINE_MEMBER_FN(SaveGame_HookTarget, void, 0x0057CEB0, UInt64 *unk0);
-	DEFINE_MEMBER_FN(LoadGame_HookTarget, bool, 0x0057D390, UInt64 *unk0, UInt32 unk1, UInt32 unk2, void *unk3);
+	DEFINE_MEMBER_FN(SaveGame_HookTarget, void, 0x00584420, UInt64 *unk0);
+	DEFINE_MEMBER_FN(LoadGame_HookTarget, bool, 0x00584910, UInt64 *unk0, UInt32 unk1, UInt32 unk2, void *unk3);
 
-	DEFINE_MEMBER_FN(ProcessEvents_Internal, void, 0x00589C50);
-	DEFINE_MEMBER_FN(DeleteSavegame, void, 0x00586F60, const char * saveName, UInt32 unk1);
+	DEFINE_MEMBER_FN(ProcessEvents_Internal, void, 0x005910D0);
+	DEFINE_MEMBER_FN(DeleteSavegame, void, 0x0058E2A0, const char * saveName, UInt32 unk1);
 };
 STATIC_ASSERT(offsetof(BGSSaveLoadManager, thread) == 0x2B0);
 STATIC_ASSERT(offsetof(BGSSaveLoadManager::Thread, hThread) == 0x30);

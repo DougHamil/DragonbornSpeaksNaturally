@@ -118,7 +118,7 @@ public:
 
 	
 	MEMBER_FN_PREFIX(NiObject);
-	DEFINE_MEMBER_FN(DeepCopy, NiStream *, 0x00C526E0, NiObject ** result);
+	DEFINE_MEMBER_FN(DeepCopy, NiStream *, 0x00C97A60, NiObject ** result);
 };
 STATIC_ASSERT(sizeof(NiObject) == 0x10);
 
@@ -175,7 +175,7 @@ public:
 	virtual void	ApplyTransform(NiMatrix33 * mtx, NiPoint3 * translate, bool postTransform);
 	virtual void	SetPropertyState(NiProperty * prop);
 	virtual void	Unk_25(UInt32 arg0); // SE: function 29
-	//virtual void	Unk_26(UInt32 arg0);
+	virtual void	Unk_26(UInt32 arg0);
 
 
 	virtual NiAVObject *	GetObjectByName(const char ** name);	// BSFixedString? alternatively BSFixedString is a typedef of a netimmerse type
@@ -215,7 +215,7 @@ public:
 
 	MEMBER_FN_PREFIX(NiAVObject);
 	// 3239A102C6E8818F0FBFEF58A1B6EA724A237258+26
-	DEFINE_MEMBER_FN(UpdateNode, void, 0x00C56890, ControllerUpdateContext * ctx);
+	DEFINE_MEMBER_FN(UpdateNode, void, 0x00C9BC10, ControllerUpdateContext * ctx);
 };
 STATIC_ASSERT(offsetof(NiAVObject, m_localTransform) == 0x48);
 STATIC_ASSERT(offsetof(NiAVObject, m_worldTransform) == 0xB0);
@@ -263,10 +263,10 @@ public:
 	UInt32	pad1C;		// 1C
 
 	MEMBER_FN_PREFIX(BSFaceGenModel);
-	DEFINE_MEMBER_FN(ctor, void, 0x003D4260);
-	DEFINE_MEMBER_FN(CopyFrom, void, 0x003D4340, BSFaceGenModel * other);
-	DEFINE_MEMBER_FN(SetModelData, bool, 0x003D49B0, const char * meshPath, void * unk1, UInt8 unk2);
-	DEFINE_MEMBER_FN(ApplyMorph, UInt8, 0x003D4820, BSFixedString * morphName, TESModelTri * triModel, NiAVObject ** headNode, float relative, UInt8 unk1);
+	DEFINE_MEMBER_FN(ctor, void, 0x003E39E0);
+	DEFINE_MEMBER_FN(CopyFrom, void, 0x003E3AC0, BSFaceGenModel * other);
+	DEFINE_MEMBER_FN(SetModelData, bool, 0x003E4130, const char * meshPath, void * unk1, UInt8 unk2);
+	DEFINE_MEMBER_FN(ApplyMorph, UInt8, 0x003E3FA0, BSFixedString * morphName, TESModelTri * triModel, NiAVObject ** headNode, float relative, UInt8 unk1);
 };
 
 // 18
@@ -277,7 +277,7 @@ public:
 	
 
 	MEMBER_FN_PREFIX(BSFaceGenMorphData);
-	DEFINE_MEMBER_FN(ApplyMorph, UInt8, 0x003D7A50, const char ** morphName, NiAVObject * faceTrishape, float relative, UInt8 unk2);
+	DEFINE_MEMBER_FN(ApplyMorph, UInt8, 0x003E71D0, const char ** morphName, NiAVObject * faceTrishape, float relative, UInt8 unk2);
 };
 
 // 20

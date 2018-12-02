@@ -1,7 +1,6 @@
 #include "skse64/NiGeometry.h"
+#include "skse64/NiAllocator.h"
 #include "skse64/GameAPI.h"
-
-RelocAddr<_CreateBSTriShape> CreateBSTriShape(0x00C671D0);
 
 void NiGeometryData::AllocateVerts(UInt32 numVerts)
 {
@@ -87,12 +86,12 @@ NiSkinInstance * NiSkinInstance::Clone(bool reuse)
 		newSkinInstance->m_spSkinData = m_spSkinData;
 		newSkinInstance->m_spSkinPartition = m_spSkinPartition;
 		newSkinInstance->m_pkRootParent = m_pkRootParent;
-		newSkinInstance->m_ppkBones = (NiAVObject**)Heap_Allocate(sizeof(NiAVObject*) * m_uiBoneNodes);
+		newSkinInstance->m_ppkBones = (NiAVObject**)NiAllocate(sizeof(NiAVObject*) * m_uiBoneNodes);
 		memcpy(newSkinInstance->m_ppkBones, this->m_ppkBones, sizeof(NiAVObject*) * m_uiBoneNodes);
 		newSkinInstance->unk30 = unk30;
 		newSkinInstance->m_uiBoneNodes = m_uiBoneNodes;
 		newSkinInstance->numFlags = numFlags;
-		newSkinInstance->flags = (UInt32 *)Heap_Allocate(sizeof(UInt32) * numFlags);
+		newSkinInstance->flags = (UInt32 *)NiAllocate(sizeof(UInt32) * numFlags);
 		newSkinInstance->unk3C = unk3C;
 		memcpy(newSkinInstance->flags, flags, sizeof(UInt32) * numFlags);
 		newSkinInstance->unk48 = unk48;
@@ -102,7 +101,7 @@ NiSkinInstance * NiSkinInstance::Clone(bool reuse)
 
 		NiSkinData * skinData = niptr_cast<NiSkinData>(newSkinInstance->m_spSkinData);
 		if (skinData) {
-			newSkinInstance->m_worldTransforms = (NiTransform**)Heap_Allocate(sizeof(NiTransform*) * skinData->m_uiBones);
+			newSkinInstance->m_worldTransforms = (NiTransform**)NiAllocate(sizeof(NiTransform*) * skinData->m_uiBones);
 			memcpy(newSkinInstance->m_worldTransforms, this->m_worldTransforms, sizeof(NiTransform*) * skinData->m_uiBones);
 		}
 	}
@@ -111,7 +110,7 @@ NiSkinInstance * NiSkinInstance::Clone(bool reuse)
 		if (!newSkinInstance->flags && numFlags > 0)
 		{
 			newSkinInstance->numFlags = numFlags;
-			newSkinInstance->flags = (UInt32 *)Heap_Allocate(sizeof(UInt32) * numFlags);
+			newSkinInstance->flags = (UInt32 *)NiAllocate(sizeof(UInt32) * numFlags);
 			memcpy(newSkinInstance->flags, flags, sizeof(UInt32) * numFlags);
 		}
 

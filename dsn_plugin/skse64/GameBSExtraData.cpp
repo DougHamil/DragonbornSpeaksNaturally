@@ -187,9 +187,7 @@ extern const void * RTTIForExtraType[0xB4] =
 };
 
 
-BSExtraData* BaseExtraList::GetByType(UInt32 type)
-{
-	BSReadLocker locker(&m_lock);
+BSExtraData* BaseExtraList::GetByType(UInt32 type) const {
 	if (!HasType(type)) return NULL;
 
 	const void* rttiType = RTTIForExtraType[type];
@@ -206,7 +204,6 @@ BSExtraData* BaseExtraList::GetByType(UInt32 type)
 
 bool BaseExtraList::Remove(UInt8 type, BSExtraData* toRemove)
 {
-	BSWriteLocker locker(&m_lock);
 	if (!toRemove) return false;
 
 	if (HasType(type)) {
@@ -236,7 +233,6 @@ bool BaseExtraList::Add(UInt8 type, BSExtraData* toAdd)
 {
 	if (!toAdd || HasType(type)) return false;
 
-	BSWriteLocker locker(&m_lock);
 	BSExtraData* next = m_data;
 	m_data = toAdd;
 	toAdd->next = next;

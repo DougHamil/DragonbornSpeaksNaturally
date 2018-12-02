@@ -76,47 +76,16 @@ class BSReadWriteLock
 public:
 	BSReadWriteLock() : threadID(0), lockValue(0) {}
 
-	//void LockForRead();
-	//void LockForWrite();
-	MEMBER_FN_PREFIX(BSReadWriteLock);
-	DEFINE_MEMBER_FN(LockForRead, void, 0x00C074C0);
-	DEFINE_MEMBER_FN(LockForWrite, void, 0x00C07540);
-	DEFINE_MEMBER_FN(UnlockRead, void, 0x00C07780);
-	DEFINE_MEMBER_FN(UnlockWrite, void, 0x00C07790);
-	DEFINE_MEMBER_FN(LockForReadAndWrite, void, 0x00C07640);
-	DEFINE_MEMBER_FN(TryLockForWrite, bool, 0x00C07730);
+	void LockForRead();
+	void LockForWrite();
+	void LockForReadAndWrite();
+
+	bool TryLockForWrite();
+	bool TryLockForRead();
+
+	void Unlock();
 };
-STATIC_ASSERT(sizeof(BSReadWriteLock) == 0x8);
-
-class BSReadLocker
-{
-public:
-	BSReadLocker(BSReadWriteLock * lock) { m_lock = lock; CALL_MEMBER_FN(m_lock, LockForRead)(); }
-	~BSReadLocker() { CALL_MEMBER_FN(m_lock, UnlockRead)(); }
-
-protected:
-	BSReadWriteLock    * m_lock;
-};
-
-class BSWriteLocker
-{
-public:
-	BSWriteLocker(BSReadWriteLock * lock) { m_lock = lock; CALL_MEMBER_FN(m_lock, LockForWrite)(); }
-	~BSWriteLocker() { CALL_MEMBER_FN(m_lock, UnlockWrite)(); }
-
-protected:
-	BSReadWriteLock    * m_lock;
-};
-
-class BSReadAndWriteLocker
-{
-public:
-	BSReadAndWriteLocker(BSReadWriteLock * lock) { m_lock = lock; CALL_MEMBER_FN(m_lock, LockForReadAndWrite)(); }
-	~BSReadAndWriteLocker() { CALL_MEMBER_FN(m_lock, UnlockWrite)(); }
-
-protected:
-	BSReadWriteLock    * m_lock;
-};
+STATIC_ASSERT(sizeof(SimpleLock) == 0x8);
 
 // 80808
 class StringCache
@@ -127,10 +96,10 @@ public:
 		const char	* data;
 
 		MEMBER_FN_PREFIX(Ref);
-		DEFINE_MEMBER_FN(ctor, Ref *, 0x00C28930, const char * buf);
-		DEFINE_MEMBER_FN(Set, Ref *, 0x00C28AA0, const char * buf);
+		DEFINE_MEMBER_FN(ctor, Ref *, 0x00C6DB20, const char * buf);
+		DEFINE_MEMBER_FN(Set, Ref *, 0x00C6DC90, const char * buf);
 		// 77D2390F6DC57138CF0E5266EB5BBB0ACABDFBE3+A0
-		DEFINE_MEMBER_FN(Release, void, 0x00C28A80);
+		DEFINE_MEMBER_FN(Release, void, 0x00C6DC70);
 
 		Ref();
 		Ref(const char * buf);
@@ -926,7 +895,7 @@ public:
 			_MESSAGE("\t\tnext: %08X", next);
 		}
 	};
-
+public:
 	// When creating a new tHashSet, init sentinel pointer with address of this entry
 	static _Entry sentinel;
 

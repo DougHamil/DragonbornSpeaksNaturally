@@ -44,7 +44,10 @@ public:
 class NiTriShape : public NiTriBasedGeom
 {
 public:
+	static NiTriShape * Create(NiTriShapeData * geometry);
 
+	MEMBER_FN_PREFIX(NiTriShape);
+	DEFINE_MEMBER_FN(ctor, NiTriShape *, 0x00000000, NiTriShapeData * geometry);
 };
 
 class BSSegmentedTriShape : public NiTriShape
@@ -56,7 +59,10 @@ public:
 class NiTriStrips : public NiTriBasedGeom
 {
 public:
+	static NiTriStrips * Create(NiTriStripsData * geometry);
 
+	MEMBER_FN_PREFIX(NiTriStrips);
+	DEFINE_MEMBER_FN(ctor, NiTriStrips *, 0x00000000, NiTriStripsData * geometry);
 };
 
 class BSGeometryData
@@ -106,9 +112,6 @@ public:
 	UInt16				unk15C;				// 15C
 	UInt16				unk15D;				// 15D
 };
-
-typedef BSTriShape * (*_CreateBSTriShape)();
-extern RelocAddr<_CreateBSTriShape> CreateBSTriShape;
 
 // 48+
 class NiGeometryData : public NiObject
@@ -215,127 +218,32 @@ public:
 	UInt16				m_usSharedNormalsArraySize;	// 56
 };
 
-enum VertexAttribute : UInt8
-{
-	VA_POSITION = 0x0,
-	VA_TEXCOORD0 = 0x1,
-	VA_TEXCOORD1 = 0x2,
-	VA_NORMAL = 0x3,
-	VA_BINORMAL = 0x4,
-	VA_COLOR = 0x5,
-	VA_SKINNING = 0x6,
-	VA_LANDDATA = 0x7,
-	VA_EYEDATA = 0x8,
-	VA_COUNT = 9
-};
-
-enum VertexFlags : UInt16
-{
-	VF_VERTEX = 1 << VA_POSITION,
-	VF_UV = 1 << VA_TEXCOORD0,
-	VF_UV_2 = 1 << VA_TEXCOORD1,
-	VF_NORMAL = 1 << VA_NORMAL,
-	VF_TANGENT = 1 << VA_BINORMAL,
-	VF_COLORS = 1 << VA_COLOR,
-	VF_SKINNED = 1 << VA_SKINNING,
-	VF_LANDDATA = 1 << VA_LANDDATA,
-	VF_EYEDATA = 1 << VA_EYEDATA,
-	VF_FULLPREC = 0x400
-};
-
-enum VertexMasks : UInt64
-{
-	DESC_MASK_VERT = 0xFFFFFFFFFFFFFFF0LL,
-	DESC_MASK_UVS = 0xFFFFFFFFFFFFFF0FLL,
-	DESC_MASK_NBT = 0xFFFFFFFFFFFFF0FFLL,
-	DESC_MASK_SKCOL = 0xFFFFFFFFFFFF0FFFLL,
-	DESC_MASK_DATA = 0xFFFFFFFFFFF0FFFFLL,
-	DESC_MASK_OFFSET = 0xFFFFFF0000000000LL,
-	DESC_MASK_FLAGS = ~(DESC_MASK_OFFSET)
-};
-
-// 28
+// 10
 class NiSkinPartition : public NiObject
 {
 public:
-	static UInt32 GetVertexAttributeOffset(UInt64 vertexDesc, VertexAttribute attr) {
-		return (vertexDesc >> (4 * (UInt8)attr + 2)) & 0x3C;
-	}
-	static VertexFlags GetVertexFlags(UInt64 vertexDesc) {
-		return VertexFlags((vertexDesc & DESC_MASK_OFFSET) >> 44);
-	}
-	static UInt32 GetVertexSize(UInt64 vertexDesc)
-	{
-		UInt32 vertexSize = 0;
-		VertexFlags flags = GetVertexFlags(vertexDesc);
-		if (flags & VF_VERTEX)
-		{
-			vertexSize += sizeof(float) * 4;
-		}
-		if (flags & VF_UV)
-		{
-			vertexSize += sizeof(UInt16) * 2;
-		}
-		if (flags & VF_UV_2)
-		{
-			vertexSize += sizeof(UInt16) * 2;
-		}
-		if (flags & VF_NORMAL)
-		{
-			vertexSize += sizeof(UInt16) * 2;
-			if (flags & VF_TANGENT)
-			{
-				vertexSize += sizeof(UInt16) * 2;
-			}
-		}
-		if (flags & VF_COLORS)
-		{
-			vertexSize += sizeof(UInt8) * 4;
-		}
-		if (flags & VF_SKINNED)
-		{
-			vertexSize += sizeof(UInt16) * 4 + sizeof(UInt8) * 4;
-		}
-		return vertexSize;
-	}
-
-	// 30
-	struct TriShape
-	{
-		struct ID3D11Buffer	* m_VertexBuffer;
-		struct ID3D11Buffer	* m_IndexBuffer;
-		uint64_t			m_VertexDesc;
-		uint32_t			m_RefCount;
-		UInt8				* m_RawVertexData;
-		UInt16				* m_RawIndexData;
-	};
-
-	// 50
+	// 28
 	struct Partition
 	{
-		UInt64		vertexDesc;				// 30
 		UInt16		* m_pusBones;			// 00
-		float		* m_pfWeights;			// 08
-		UInt16		* m_pusVertexMap;		// 10
-		UInt8		* m_pucBonePalette;		// 18
-		UInt16		* m_pusTriList;			// 20
-		UInt16		* m_pusStripLengths;	// 28
-		UInt16		m_usVertices;			// 38
-		UInt16		m_usTriangles;			// 3A
-		UInt16		m_usBones;				// 3C
-		UInt16		m_usStrips;				// 3E
-		UInt16		m_usBonesPerVertex;		// 40
-		float		unk44;					// 44
-		TriShape	* shapeData;			// 48
+		float		* m_pfWeights;			// 04
+		UInt16		* m_pusVertexMap;		// 08
+		UInt8		* m_pucBonePalette;		// 0C
+		UInt16		* m_pusTriList;			// 10
+		UInt16		* m_pusStripLengths;	// 14
+		UInt16		m_usVertices;			// 18
+		UInt16		m_usTriangles;			// 1A
+		UInt16		m_usBones;				// 1C
+		UInt16		m_usStrips;				// 1E
+		UInt16		m_usBonesPerVertex;		// 20
+		UInt8		pad22[2];				// 22
+		UInt32		unk24;					// 24
 
 		void	AllocateWeights(UInt32 numVerts);
 	};
 
-	UInt32		m_uiPartitions;		// 10
-	UInt32		unk14;				// 14
-	Partition	* m_pkPartitions;	// 18
-	UInt32		vertexCount;		// 20
-	UInt32		unk24;				// 24
+	UInt32		m_uiPartitions;		// 08
+	Partition	* m_pkPartitions;	// 0C
 };
 
 // 48
@@ -398,8 +306,8 @@ public:
 	NiSkinInstance * Clone(bool reuse = true);
 
 	MEMBER_FN_PREFIX(NiSkinInstance);
-	DEFINE_MEMBER_FN(Copy, NiSkinInstance*, 0x00C52490);
-	DEFINE_MEMBER_FN(ctor, NiSkinInstance *, 0x00C7E8A0);
+	DEFINE_MEMBER_FN(Copy, NiSkinInstance*, 0x00C97810);
+	DEFINE_MEMBER_FN(ctor, NiSkinInstance *, 0x00CC5250);
 };
 //STATIC_ASSERT(sizeof(NiSkinInstance) == 0x38);
 
@@ -416,6 +324,6 @@ public:
 	static BSDismemberSkinInstance * Create();
 
 	MEMBER_FN_PREFIX(BSDismemberSkinInstance);
-	DEFINE_MEMBER_FN(ctor, BSDismemberSkinInstance *, 0x00C6B9B0);
+	DEFINE_MEMBER_FN(ctor, BSDismemberSkinInstance *, 0x00CB1960);
 };
 //STATIC_ASSERT(sizeof(BSDismemberSkinInstance) == 0x44);

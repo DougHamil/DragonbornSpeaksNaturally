@@ -17,11 +17,11 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "FileDescription", "A component of the Skyrim SE Script Extender"
+            VALUE "FileDescription", "A component of the Skyrim VR Script Extender"
 			VALUE "FileVersion", SKSE_VERSION_VERSTRING
-            VALUE "InternalName", "SKSE64"
+            VALUE "InternalName", "SKSEVR"
             VALUE "LegalCopyright", "Copyright (C) 2006-2018"
-            VALUE "ProductName", "SKSE64"
+            VALUE "ProductName", "SKSEVR"
 			VALUE "ProductVersion", SKSE_VERSION_VERSTRING
         END
     END

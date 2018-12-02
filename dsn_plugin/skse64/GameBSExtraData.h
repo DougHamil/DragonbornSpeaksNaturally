@@ -222,9 +222,7 @@ public:
 		UInt8	bits[0x18];
 	};
 
-	bool HasType(UInt32 type)
-	{
-		BSReadLocker locker(&m_lock);
+	bool HasType(UInt32 type) const {
 		return (m_presence) ? m_presence->HasType(type) : false;
 	}
 
@@ -247,7 +245,7 @@ public:
 
 	const char * GetDisplayName(TESForm * type);
 
-	BSExtraData* GetByType(UInt32 type);
+	BSExtraData* GetByType(UInt32 type) const;
 	BSExtraData			* m_data;		// 00
 	PresenceBitfield	* m_presence;	// 08
 
@@ -257,9 +255,9 @@ public:
 private:
 	MEMBER_FN_PREFIX(BaseExtraList);
 	// 6AE109C256B98466C001B25B75BD48FB62F884B1+5A
-	DEFINE_MEMBER_FN(CheckContainerExtraData_Internal, bool, 0x0010CE30, bool isEquipped);
+	DEFINE_MEMBER_FN(CheckContainerExtraData_Internal, bool, 0x0011D220, bool isEquipped);
 	// This also does some internal ReferenceHandle lookup
-	DEFINE_MEMBER_FN(GetExtraTextDisplayData_Internal, ExtraTextDisplayData*, 0x00111610);
+	DEFINE_MEMBER_FN(GetExtraTextDisplayData_Internal, ExtraTextDisplayData*, 0x00121A00);
 };
 
 typedef tList<BaseExtraList> ExtendDataList;

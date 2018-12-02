@@ -336,7 +336,7 @@ public:
 	static BSShaderTextureSet * Create();
 
 	MEMBER_FN_PREFIX(BSShaderTextureSet);
-	DEFINE_MEMBER_FN(ctor, BSShaderTextureSet *, 0x012E06F0);
+	DEFINE_MEMBER_FN(ctor, BSShaderTextureSet *, 0x01307710);
 };
 
 STATIC_ASSERT(sizeof(BSShaderTextureSet) == 0x58);
@@ -457,8 +457,8 @@ public:
 	UInt64				unk88;	// 88
 
 	MEMBER_FN_PREFIX(MagicItem);
-	DEFINE_MEMBER_FN(GetCostliestEffectItem, EffectItem *, 0x00101EB0, int arg1, bool arg2);
-	DEFINE_MEMBER_FN(GetEffectiveMagickaCost, float, 0x00101C20, Character* caster);
+	DEFINE_MEMBER_FN(GetCostliestEffectItem, EffectItem *, 0x00112270, int arg1, bool arg2);
+	DEFINE_MEMBER_FN(GetEffectiveMagickaCost, float, 0x00111FE0, Character* caster);
 };
 
 STATIC_ASSERT(sizeof(MagicItem) == 0x90);
@@ -793,11 +793,11 @@ public:
 	UInt64		unk260;			// 260
 
 	MEMBER_FN_PREFIX(TESNPC);
-	DEFINE_MEMBER_FN(GetSex, char, 0x00351490);
-	DEFINE_MEMBER_FN(HasOverlays, bool, 0x00368C10);
+	DEFINE_MEMBER_FN(GetSex, char, 0x00360B60);
+	DEFINE_MEMBER_FN(HasOverlays, bool, 0x00378380);
 
 	// Swaps a headPart of the same type as target with target
-	DEFINE_MEMBER_FN(ChangeHeadPart, void, 0x00365DE0, BGSHeadPart * target);
+	DEFINE_MEMBER_FN(ChangeHeadPart, void, 0x00375550, BGSHeadPart * target);
 
 	struct MorphAction {
 		BSFaceGenNiNode * faceNode;
@@ -811,10 +811,11 @@ public:
 	DEFINE_MEMBER_FN(ApplyMorph, void, 0x00000000, MorphAction * morphAction); // 1403D23D0 <-- moved
 
 	// Updates the neck seam when weight changed
-	DEFINE_MEMBER_FN(UpdateNeck, void, 0x003608C0, BSFaceGenNiNode * faceNode);
+	DEFINE_MEMBER_FN(UpdateNeck, void, 0x0036FFD0, BSFaceGenNiNode * faceNode);
 
 	// Computes RGB SkinTone from RGBA TintMask
-	DEFINE_MEMBER_FN(SetSkinFromTint, void, 0x00360670, NiColorA * result, TintMask * tintMask, UInt32 compute, UInt32 unk1);
+	// C74DE866EA2CBFADF8A164FC95A889A9DBA09091+C7
+	DEFINE_MEMBER_FN(SetSkinFromTint, void, 0x0036FD80, NiColorA * result, TintMask * tintMask, UInt32 compute, UInt32 unk1);
 
 	void SetFaceTexture(BGSTextureSet * textureSet);
 	void SetHairColor(BGSColorForm * hairColor);

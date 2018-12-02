@@ -35,6 +35,15 @@ public:
 	virtual void	Unk_08(void* unk1);		// pure 	
 };
 
+//	00	ButtonEvent
+//	01	MouseMoveEvent
+//	02	CharEvent
+//	03	ThumbstickEvent
+//	04	DeviceConnectEvent
+//	05	KinectEvent
+//	06	VrWandTouchpadPositionEvent
+//	07	VrWandTouchpadSwipeEvent
+
 // 18
 class InputEvent
 {
@@ -287,7 +296,7 @@ public:
 	// used by Hooks_Event
 	PlayerControls * ctor_Hook(void);
 	MEMBER_FN_PREFIX(PlayerControls);
-	DEFINE_MEMBER_FN(ctor, PlayerControls *, 0x00704B60);
+	DEFINE_MEMBER_FN(ctor, PlayerControls *, 0x0072B900);
 };
 STATIC_ASSERT(offsetof(PlayerControls, runMode) == 0x049);
 STATIC_ASSERT(offsetof(PlayerControls, remapMode) == 0x050);
@@ -434,8 +443,8 @@ public:
 
 	static InputStringHolder *	GetSingleton(void)
 	{
-		// 38C98DE3888C4A78379B4BC9F21B33FA74FB6E4C+32
-		static RelocPtr<InputStringHolder*> g_inputStringHolder(0x02F4C250);
+		// F1F9E171ECCBA02B07850342C5C84CAE531026C7+D0
+		static RelocPtr<InputStringHolder*> g_inputStringHolder(0x02FEA140);
 		return *g_inputStringHolder;
 	}
 };

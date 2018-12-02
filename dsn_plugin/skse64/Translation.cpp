@@ -84,7 +84,7 @@ namespace Translation
 		ASSERT(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, SHGFP_TYPE_CURRENT, appdataPath)));
 
 		std::string	modlistPath = appdataPath;
-		modlistPath += "\\Skyrim Special Edition\\plugins.txt";
+		modlistPath += "\\Skyrim VR\\plugins.txt";
 
 		// Parse mod list file to acquire translation filenames
 		IFileStream modlistFile;
@@ -116,7 +116,7 @@ namespace Translation
 				{
 					std::string ext = line.substr(lastDelim);
 
-					if(_stricmp(ext.c_str(), ".ESM") == 0 || _stricmp(ext.c_str(),".ESP") == 0 || _stricmp(ext.c_str(), ".ESL") == 0)
+					if(_stricmp(ext.c_str(), ".ESM") == 0 || _stricmp(ext.c_str(),".ESP") == 0)
 					{
 						std::string name = line.substr(0, lastDelim);
 						ParseTranslation(translator, name);

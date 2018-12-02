@@ -43,7 +43,7 @@ void SKSE64_Initialize(void)
 	if(isInit) return;
 	isInit = true;
 
-	gLog.OpenRelative(CSIDL_MYDOCUMENTS, "\\My Games\\Skyrim Special Edition\\SKSE\\skse64.log");
+	gLog.OpenRelative(CSIDL_MYDOCUMENTS, "\\My Games\\Skyrim VR\\SKSE\\sksevr.log");
 
 #ifndef _DEBUG
 	__try {
@@ -52,7 +52,7 @@ void SKSE64_Initialize(void)
 		FILETIME	now;
 		GetSystemTimeAsFileTime(&now);
 
-		_MESSAGE("SKSE64 runtime: initialize (version = %d.%d.%d %08X %08X%08X, os = %s)",
+		_MESSAGE("SKSEVR runtime: initialize (version = %d.%d.%d %08X %08X%08X, os = %s)",
 			SKSE_VERSION_INTEGER, SKSE_VERSION_INTEGER_MINOR, SKSE_VERSION_INTEGER_BETA, RUNTIME_VERSION,
 			now.dwHighDateTime, now.dwLowDateTime, GetOSInfoStr().c_str());
 

@@ -177,9 +177,6 @@
     <ClCompile Include="NiAdditionalGeometryData.cpp">
       <Filter>netimmerse</Filter>
     </ClCompile>
-    <ClCompile Include="NiAllocator.cpp">
-      <Filter>netimmerse</Filter>
-    </ClCompile>
     <ClCompile Include="NiControllers.cpp">
       <Filter>netimmerse</Filter>
     </ClCompile>
@@ -604,9 +601,6 @@
       <Filter>netimmerse</Filter>
     </ClInclude>
     <ClInclude Include="NiAdditionalGeometryData.h">
-      <Filter>netimmerse</Filter>
-    </ClInclude>
-    <ClInclude Include="NiAllocator.h">
       <Filter>netimmerse</Filter>
     </ClInclude>
     <ClInclude Include="NiControllers.h">

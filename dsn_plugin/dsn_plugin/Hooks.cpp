@@ -5,12 +5,16 @@
 #include "skse64_common/SafeWrite.h"
 #include "skse64/ScaleformMovie.h"
 #include "skse64/ScaleformValue.h"
+#include "skse64/GameInput.h"
 #include "skse64_common/BranchTrampoline.h"
 #include "xbyak.h"
 #include "SkyrimType.h"
 #include "ConsoleCommandRunner.h"
 #include "FavoritesMenuManager.h"
 
+class RunCommandSink;
+
+static RunCommandSink *runCommandSink = NULL;
 static GFxMovieView* dialogueMenu = NULL;
 static int desiredTopicIndex = 1;
 static int numTopics = 0;
@@ -57,6 +61,25 @@ static void __cdecl Hook_PostLoad() {
 	}
 }
 
+static void runCommand() {
+	std::string command = SpeechRecognitionClient::getInstance()->PopCommand();
+	if (command != "") {
+		ConsoleCommandRunner::RunCommand(command);
+		Log::info("run command: " + command);
+	}
+
+	if (g_SkyrimType == VR) {
+		FavoritesMenuManager::getInstance()->ProcessEquipCommands();
+	}
+}
+
+class RunCommandSink : public BSTEventSink<InputEvent> {
+	EventResult ReceiveEvent(InputEvent ** evnArr, InputEventDispatcher * dispatcher) override {
+		runCommand();
+		return kEvent_Continue;
+	}
+};
+
 static void __cdecl Hook_Loop()
 {
 	if (dialogueMenu != NULL)
@@ -77,7 +100,11 @@ static void __cdecl Hook_Loop()
 			lastMenuState = menuState;
 			if (menuState == 2) // NPC Responding
 			{
+				// fix issue #11 (SSE crash when teleport with a dialogue line).
+				// It seems no side effects have been found at present.
+				dialogueMenu = NULL;
 				SpeechRecognitionClient::getInstance()->StopDialogue();
+				return;
 			}
 		}
 		if (desiredTopicIndex >= 0) {
@@ -100,13 +127,23 @@ static void __cdecl Hook_Loop()
 	}
 	else
 	{
-		std::string command = SpeechRecognitionClient::getInstance()->PopCommand();
-		if (command != "") {
-			ConsoleCommandRunner::RunCommand(command);
+		if (g_SkyrimType == VR) {
+			runCommand();
 		}
-
-		if (g_SkyrimType == VR)
-			FavoritesMenuManager::getInstance()->ProcessEquipCommands();
+		else {
+			// The latest version of SkyrimSE will not enter the loop if no menu is displayed.
+			// So we use InputEventSink to get a continuous running loop.
+			static bool inited = false;
+			if (!inited) {
+				Log::info("RunCommandSink Initialized");
+				runCommandSink = new RunCommandSink;
+				// Currently in the source code directory is the latest version of SKSE64 instead of SKSEVR,
+				// so we can call GetSingleton() directly instead of use a RelocAddr.
+				auto inputEventDispatcher = InputEventDispatcher::GetSingleton();
+				inputEventDispatcher->AddEventSink(runCommandSink);
+				inited = true;
+			}
+		}
 	}
 }
 
@@ -130,22 +167,22 @@ static uintptr_t LOAD_EVENT_TARGET_ADDR[3];
 void Hooks_Inject(void)
 {
 	// "call" Scaleform invocation
-	INVOKE_ENTER_ADDR[SE] = 0xED6C8E;
+	INVOKE_ENTER_ADDR[SE] = 0xED68EE;
 	INVOKE_ENTER_ADDR[VR] = 0xF343CE;
 	INVOKE_ENTER_ADDR[VR_BETA] = 0xF343CE;
 
 	// Target of "call" invocation
-	INVOKE_TARGET_ADDR[SE] = 0xED8190; // SkyrimSE 0xED8190 0x00007FF724928190 
+	INVOKE_TARGET_ADDR[SE] = 0xED7DF0; // SkyrimSE 0xED7DF0 0x00007FF7C38D7DF0
 	INVOKE_TARGET_ADDR[VR] = 0xF30F20; // SkyrimVR 0xF2D9B0 0x00007FF73284D9B0
 	INVOKE_TARGET_ADDR[VR_BETA] = 0xF30F20; // SkyrimVR 0xF2D9B0 0x00007FF73284D9B0
 
 	// "CurrentTime" GFxMovie.SetVariable (rax+80)
-	LOOP_ENTER_ADDR[SE] = 0x87F1AC; // SkyrimSE 0x87F1AC 0x00007FF7242CF1AC
+	LOOP_ENTER_ADDR[SE] = 0xECD637; // SkyrimSE 0xECD637 0x00007FF712D4D637
 	LOOP_ENTER_ADDR[VR] = 0x8AC25C; // 0x8AA36C 0x00007FF7321CA36C SKSE UIManager process hook:  0x00F17200 + 0xAD8
 	LOOP_ENTER_ADDR[VR_BETA] = 0x8AC25C; // 0x8AA36C 0x00007FF7321CA36C SKSE UIManager process hook:  0x00F17200 + 0xAD8
 	
 	// "CurrentTime" GFxMovie.SetVariable Target (rax+80)
-	LOOP_TARGET_ADDR[SE] = 0xF29030; // SkyrimSE 0xF29030 0x00007FF724979030
+	LOOP_TARGET_ADDR[SE] = 0xF28C90; // SkyrimSE 0xF28C90 0x00007FF712DA8C90
 	LOOP_TARGET_ADDR[VR] = 0xF85C50; // SkyrimVR 0xF82710 0x00007FF7328A2710 SKSE UIManager process hook:  0x00F1C650
 	LOOP_TARGET_ADDR[VR_BETA] = 0xF85C50; // SkyrimVR 0xF82710 0x00007FF7328A2710 SKSE UIManager process hook:  0x00F1C650
 

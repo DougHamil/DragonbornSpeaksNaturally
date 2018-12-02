@@ -10,9 +10,9 @@
 
 static UInt32 g_forceContainerCategorization = 0;
 
-// 59347F2939D95BA10F7C25036702DA321C7D56F1+FA
-RelocPtr<UInt32 *> g_containerMode(0x03011720);
-RelocAddr<uintptr_t> kHook_ContainerMode_Base(0x0088A2C0);
+// 30A34F24A97F91365E1A3F66BF53263DEDF4B0AD+FA
+RelocPtr<UInt32 *> g_containerMode(0x02F73328);
+RelocAddr<uintptr_t> kHook_ContainerMode_Base(0x0085F2B0);
 uintptr_t kHook_ContainerMode_Categories = kHook_ContainerMode_Base + 0x6E;
 uintptr_t kHook_ContainerMode_NoCategories = kHook_ContainerMode_Base + 0x82;
 
@@ -22,19 +22,19 @@ void Hooks_Gameplay_EnableForceContainerCategorization(bool enable)
 }
 
 UInt32 g_invalidateKeywordCache = 0;
-RelocAddr<uintptr_t> kHook_BGSKeyword_Base(0x003433F0);
+RelocAddr<uintptr_t> kHook_BGSKeyword_Base(0x00333D20);
 uintptr_t kHook_BGSKeyword_Create_Return = kHook_BGSKeyword_Base + 6;
 
 // 4C1457C3040DCD34A7E7B2326F1EA2023930C56B+71
-RelocAddr <char *> g_gameVersion(0x015BC158);
-RelocAddr <uintptr_t> kHook_ShowVersion_Offset(0x00923D50 + 0x78);
+RelocAddr <char *> g_gameVersion(0x0155EF00);
+RelocAddr <uintptr_t> kHook_ShowVersion_Offset(0x008EF000 + 0x78);
 static char		kHook_ShowVersion_FormatString[] =
-"%s.%d (SKSEVR " __PREPRO_TOKEN_STR__(SKSE_VERSION_INTEGER) "."
+"%s.%d (SKSE64 " __PREPRO_TOKEN_STR__(SKSE_VERSION_INTEGER) "."
 __PREPRO_TOKEN_STR__(SKSE_VERSION_INTEGER_MINOR) "."
 __PREPRO_TOKEN_STR__(SKSE_VERSION_INTEGER_BETA) " rel "
 __PREPRO_TOKEN_STR__(SKSE_VERSION_RELEASEIDX) ")";
 
-RelocAddr<uintptr_t> kHook_Crosshair_LookupREFRByHandle_Enter(0x006D3770 + 0x112);
+RelocAddr<uintptr_t> kHook_Crosshair_LookupREFRByHandle_Enter(0x006B0760 + 0x90);
 
 TESObjectREFR*	g_curCrosshairRef = NULL;
 
@@ -64,7 +64,7 @@ TESObjectREFR* Hooks_Gameplay_GetCrosshairRef()
 
 static UInt8 s_disableMapMenuMouseWheel = 1;
 
-RelocAddr<uintptr_t> kHook_MapMenuMouseWheel_Enter(0x00910440 + 0x340);
+RelocAddr<uintptr_t> kHook_MapMenuMouseWheel_Enter(0x008DD090 + 0x18B);
 
 void Hooks_Gameplay_EnableMapMenuMouseWheel(bool enable)
 {
@@ -186,9 +186,8 @@ void Hooks_Gameplay_Commit(void)
 				mov(al, ptr[rax]);
 
 				// Original code
-				pop(r15);
-				pop(r14);
-				pop(rbp);
+				add(rsp, 0x30);
+				pop(rdi);
 				ret();
 			}
 		};

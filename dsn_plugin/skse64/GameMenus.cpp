@@ -1,6 +1,6 @@
 #include "GameMenus.h"
 
-RelocAddr <_CreateUIMessageData> CreateUIMessageData(0x00335740);
+RelocAddr <_CreateUIMessageData> CreateUIMessageData(0x003260F0);
 
 IMenu::IMenu() :
 	view(NULL),
@@ -9,19 +9,6 @@ IMenu::IMenu() :
 	unk14(0x12),
 	unk18(NULL)
 {
-}
-
-UInt32 IMenu::ProcessUnkData1(UnkData1* data)
-{
-	if (data->unk04 == 6)
-	{
-		if (view && data->data)
-		{
-			view->HandleEvent(data->data->unk08);
-			return 0;
-		}
-	}
-	return 2;
 }
 
 void IMenu::Render(void)

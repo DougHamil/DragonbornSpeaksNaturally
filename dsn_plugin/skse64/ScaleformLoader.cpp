@@ -24,13 +24,13 @@ GFxLoader *GFxLoader::ctor_Hook(void)
 
 GFxLoader * GFxLoader::GetSingleton()
 {
-	// 288124718F8102AA5D2B09022062AF83F3795442+AE
-	RelocPtr<GFxLoader*> g_GFxLoader(0x02FEA518);
+	// 4E9F39D1066653EF254B38406212E476F80A6C9B+AE
+	RelocPtr<GFxLoader*> g_GFxLoader(0x02F4C7A0);
 	return *g_GFxLoader;	
 }
 
 UInt64* GFxLoader::getCtorHookAddress()
 {
-	RelocPtr<UInt64> ctorHookAddress(0x005B5880 + 0xACE);
+	RelocPtr<UInt64> ctorHookAddress(0x005AE200 + 0xA08);
 	return ctorHookAddress;
 }

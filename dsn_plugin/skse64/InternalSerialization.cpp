@@ -40,7 +40,7 @@ void LoadModList(SKSESerializationInterface * intfc)
 void SaveModList(SKSESerializationInterface * intfc)
 {
 	DataHandler * dhand = DataHandler::GetSingleton();
-	UInt8 modCount = dhand->modList.loadedModCount;
+	UInt8 modCount = dhand->modList.loadedMods.count;
 
 	intfc->OpenRecord('MODS', 0);
 	intfc->WriteRecordData(&modCount, sizeof(modCount));
@@ -62,10 +62,16 @@ UInt8 ResolveModIndex(UInt8 modIndex)
 	return (modIndex < s_numSavefileMods) ? s_savefileIndexMap[modIndex] : 0xFF;
 }
 
-static UInt8	s_saveLightfileIndexMap[0xFFF];
-static UInt8	s_numSaveLightfileMods = 0;
+static UInt16	s_saveLightfileIndexMap[0xFFF];
+static UInt16	s_numSaveLightfileMods = 0;
 
-void LoadLightModList(SKSESerializationInterface * intfc)
+enum LightModVersion
+{
+	kVersion1 = 1,
+	kVersion2 = 2
+};
+
+void LoadLightModList(SKSESerializationInterface * intfc, UInt32 version)
 {
 	_MESSAGE("Loading light mod list:");
 
@@ -74,14 +80,22 @@ void LoadLightModList(SKSESerializationInterface * intfc)
 	char name[0x104] = { 0 };
 	UInt16 nameLen = 0;
 
-	intfc->ReadRecordData(&s_numSaveLightfileMods, sizeof(s_numSaveLightfileMods));
+	if (version == kVersion1)
+	{
+		intfc->ReadRecordData(&s_numSaveLightfileMods, sizeof(UInt8));
+	}
+	else if (version == kVersion2)
+	{
+		intfc->ReadRecordData(&s_numSaveLightfileMods, sizeof(UInt16));
+	}
+	
 	for (UInt32 i = 0; i < s_numSaveLightfileMods; i++)
 	{
 		intfc->ReadRecordData(&nameLen, sizeof(nameLen));
 		intfc->ReadRecordData(&name, nameLen);
 		name[nameLen] = 0;
 
-		UInt8 newIndex = dhand->GetLoadedLightModIndex(name);
+		UInt16 newIndex = dhand->GetLoadedLightModIndex(name);
 		s_saveLightfileIndexMap[i] = newIndex;
 		_MESSAGE("\t(%d -> %d)\t%s", i, newIndex, &name);
 	}
@@ -90,10 +104,21 @@ void LoadLightModList(SKSESerializationInterface * intfc)
 void SaveLightModList(SKSESerializationInterface * intfc)
 {
 	DataHandler * dhand = DataHandler::GetSingleton();
-	UInt8 modCount = 0;
+	UInt16 modCount = dhand->modList.loadedCCMods.count;
 
-	intfc->OpenRecord('LMOD', 0);
+	intfc->OpenRecord('LIMD', 0);
 	intfc->WriteRecordData(&modCount, sizeof(modCount));
+
+	_MESSAGE("Saving light mod list:");
+
+	for (UInt32 i = 0; i < modCount; i++)
+	{
+		ModInfo * modInfo = dhand->modList.loadedCCMods[i];
+		UInt16 nameLen = strlen(modInfo->name);
+		intfc->WriteRecordData(&nameLen, sizeof(nameLen));
+		intfc->WriteRecordData(modInfo->name, nameLen);
+		_MESSAGE("\t(%d)\t%s", i, &modInfo->name);
+	}
 }
 
 UInt16 ResolveLightModIndex(UInt16 modIndex)
@@ -170,9 +195,14 @@ void Core_LoadCallback(SKSESerializationInterface * intfc)
 			LoadModList(intfc);
 			break;
 
-		// Light Mod list
+		// Legacy Light Mod list - This only supported 255 entries
 		case 'LMOD':
-			LoadLightModList(intfc);
+			LoadLightModList(intfc, kVersion1);
+			break;
+
+		// Light Mod list
+		case 'LIMD':
+			LoadLightModList(intfc, kVersion2);
 			break;
 
 		// Menu open/close events

@@ -29,10 +29,8 @@ CustomMenu::CustomMenu(const char* swfPath)
 	unk0C = 0xA;
 	unk14 = 1;
 
-#ifdef FIXME
-	if(!(*g_inputEventDispatcher)->IsGamepadEnabled())
+	if(!InputEventDispatcher::GetSingleton()->IsGamepadEnabled())
 		flags |= 0x404; // Shows the cursor when no gamepad is enabled
-#endif
 
 #ifdef _CUSTOMMENU_ITEMDISPLAY
 	flags |= 0x1000;

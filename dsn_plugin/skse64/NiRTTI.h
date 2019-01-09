@@ -5,7 +5,7 @@
  *	BSFaceGenMorphData
  *		BSFaceGenMorphDataHead
  *		BSFaceGenMorphDataHair
- *	
+ *
  *	BSTempEffect
  *		BSTempEffectDebris
  *		BSTempEffectGeometryDecal
@@ -16,59 +16,9 @@
  *			ModelReferenceEffect
  *			ShaderReferenceEffect
  *			SummonPlacementEffect
- *	
+ *
  *	NiObject
- *		NiControllerSequence
- *			BSAnimGroupSequence
- *		NiFloatData
- *		NiColorData
- *		NiInterpolator
- *			NiBlendInterpolator
- *				NiBlendTransformInterpolator
- *				NiBlendFloatInterpolator
- *				NiBlendAccumTransformInterpolator
- *				BSBlendTreadTransfInterpolator
- *				NiBlendQuaternionInterpolator
- *				NiBlendPoint3Interpolator
- *				NiBlendColorInterpolator
- *				NiBlendBoolInterpolator
- *			NiKeyBasedInterpolator
- *				NiFloatInterpolator
- *				NiColorInterpolator
- *				NiPathInterpolator
- *				NiTransformInterpolator
- *					BSRotAccumTransfInterpolator
- *				BSTreadTransfInterpolator
- *				NiQuaternionInterpolator
- *				NiPoint3Interpolator
- *				NiBoolInterpolator
- *					NiBoolTimelineInterpolator
- *			NiLookAtInterpolator
- *			NiBSplineInterpolator
- *				NiBSplineTransformInterpolator
- *					NiBSplineCompTransformInterpolator
- *				NiBSplinePoint3Interpolator
- *					NiBSplineCompPoint3Interpolator
- *				NiBSplineFloatInterpolator
- *					NiBSplineCompFloatInterpolator
- *				NiBSplineColorInterpolator
- *					NiBSplineCompColorInterpolator
- *		NiMorphData
- *		NiPosData
- *		NiTransformData
- *		BSAnimNote
- *			BSLookIKNote
- *			BSGrabIKNote
- *		BSAnimNotes
- *		NiUVData
- *		NiStringPalette
- *		NiSequence
- *		NiRotData
- *		NiBSplineData
- *		NiBSplineBasisData
- *		NiBoolData
  *		NiObjectNET
- *			NiSequenceStreamHelper
  *			NiAVObject
  *				NiNode
  *					BGSDecalNode
@@ -93,35 +43,39 @@
  *						BSMultiBoundNode
  *						BSOrderedNode
  *					BSFadeNode
- *					BSTreeNode
  *					BSLeafAnimNode
+ *					BSTreeNode
  *					ShadowSceneNode
  *					BSClearZNode
- *				NiCamera
- *					BSCubeMapCamera
  *				NiLight
  *					NiPointLight
  *						NiSpotLight
  *					NiDirectionalLight
  *					NiAmbientLight
- *				NiGeometry
- *					NiLines
+ *				NiCamera
+ *					BSCubeMapCamera
+ *				BSGeometry
+ *					BSTriShape
+ *						BSDynamicTriShape
+ *						BSSubIndexTriShape
+ *							BSSubIndexLandTriShape
+ *						BSInstanceTriShape
+ *							BSMultiStreamInstanceTriShape
+ *						BSMultiIndexTriShape
+ *							BSLODMultiIndexTriShape
+ *						BSMeshLODTriShape
  *					NiParticles
  *						NiParticleMeshes
  *						NiParticleSystem
  *							NiMeshParticleSystem
  *							BSStripParticleSystem
+ *					BSLines
+ *						BSDynamicLines
+ *				NiGeometry
  *					NiTriBasedGeom
  *						NiTriShape
- *							BSSegmentedTriShape
- *								BSSegmentedLandTriShape
- *							NiScreenElements
  *							BSLODTriShape
- *							BSInstanceTriShape
- *								BSMultiStreamInstanceTriShape
- *							BSMultiIndexTriShape
- *								BSLODMultiIndexTriShape
- *							BSParticleShaderGeometry
+ *							BSSegmentedTriShape
  *						NiTriStrips
  *			NiProperty
  *				NiAlphaProperty
@@ -137,10 +91,7 @@
  *						BSDistantTreeShaderProperty
  *				NiFogProperty
  *					BSFogProperty
- *		NiRenderer
- *			NiDX9Renderer
- *		NiAdditionalGeometryData
- *			BSPackedAdditionalGeometryData
+ *			NiSequenceStreamHelper
  *		BSDismemberSkinInstance
  *		NiTimeController
  *			REFRSyncController
@@ -151,100 +102,84 @@
  *			NiInterpController
  *				NiMultiTargetTransformController
  *				BSMultiTargetTreadTransfController
- *				NiGeomMorpherController
  *				NiSingleInterpController
  *					NiTransformController
  *					NiExtraDataController
  *						NiFloatExtraDataController
- *						NiFloatsExtraDataPoint3Controller
- *						NiFloatsExtraDataController
  *						NiColorExtraDataController
- *					NiFloatInterpController
- *						BSFrustumFOVController
- *						NiLightDimmerController
- *						BSNiAlphaPropertyTestRefController
- *						BSEffectShaderPropertyFloatController
- *						BSLightingShaderPropertyUShortController
- *						BSLightingShaderPropertyFloatController
- *					NiBoolInterpController
- *						NiVisController
+ *						NiFloatsExtraDataController
+ *						NiFloatsExtraDataPoint3Controller
  *					NiPoint3InterpController
  *						NiLightColorController
- *						BSEffectShaderPropertyColorController
  *						BSLightingShaderPropertyColorController
+ *						BSEffectShaderPropertyColorController
+ *					NiFloatInterpController
+ *						NiLightDimmerController
+ *						BSFrustumFOVController
+ *						BSLightingShaderPropertyFloatController
+ *						BSLightingShaderPropertyUShortController
+ *						BSEffectShaderPropertyFloatController
+ *						BSNiAlphaPropertyTestRefController
+ *					NiBoolInterpController
+ *						NiVisController
  *					NiPSysModifierCtlr
  *						NiPSysEmitterCtlr
  *							BSPSysMultiTargetEmitterCtlr
+ *						NiPSysModifierFloatCtlr
+ *							NiPSysAirFieldAirFrictionCtlr
+ *							NiPSysAirFieldInheritVelocityCtlr
+ *							NiPSysAirFieldSpreadCtlr
+ *							NiPSysEmitterDeclinationCtlr
+ *							NiPSysEmitterDeclinationVarCtlr
+ *							NiPSysEmitterInitialRadiusCtlr
+ *							NiPSysEmitterLifeSpanCtlr
+ *							NiPSysEmitterPlanarAngleCtlr
+ *							NiPSysEmitterPlanarAngleVarCtlr
+ *							NiPSysEmitterSpeedCtlr
+ *							NiPSysFieldAttenuationCtlr
+ *							NiPSysFieldMagnitudeCtlr
+ *							NiPSysFieldMaxDistanceCtlr
+ *							NiPSysGravityStrengthCtlr
+ *							NiPSysInitialRotAngleCtlr
+ *							NiPSysInitialRotAngleVarCtlr
+ *							NiPSysInitialRotSpeedCtlr
+ *							NiPSysInitialRotSpeedVarCtlr
  *						NiPSysModifierBoolCtlr
  *							NiPSysModifierActiveCtlr
- *						NiPSysModifierFloatCtlr
- *							NiPSysInitialRotSpeedVarCtlr
- *							NiPSysInitialRotSpeedCtlr
- *							NiPSysInitialRotAngleVarCtlr
- *							NiPSysInitialRotAngleCtlr
- *							NiPSysGravityStrengthCtlr
- *							NiPSysFieldMaxDistanceCtlr
- *							NiPSysFieldMagnitudeCtlr
- *							NiPSysFieldAttenuationCtlr
- *							NiPSysEmitterSpeedCtlr
- *							NiPSysEmitterPlanarAngleVarCtlr
- *							NiPSysEmitterPlanarAngleCtlr
- *							NiPSysEmitterLifeSpanCtlr
- *							NiPSysEmitterInitialRadiusCtlr
- *							NiPSysEmitterDeclinationVarCtlr
- *							NiPSysEmitterDeclinationCtlr
- *							NiPSysAirFieldSpreadCtlr
- *							NiPSysAirFieldInheritVelocityCtlr
- *							NiPSysAirFieldAirFrictionCtlr
  *				BSProceduralLightningController
- *			NiUVController
- *			NiPathController
- *			NiLookAtController
  *			NiKeyframeManager
- *			NiBoneLODController
+ *			NiLookAtController
+ *			NiPathController
  *			NiFloatController
  *				NiRollController
- *			NiBSBoneLODController
- *			BSLagBoneController
  *			NiPSysUpdateCtlr
  *			NiPSysResetOnLoopCtlr
+ *			NiBSBoneLODController
+ *			BSLagBoneController
  *			bhkBlendController
- *		NiGeometryData
- *			NiTriBasedGeomData
- *				NiTriShapeData
- *					NiScreenElementsData
- *					NiTriShapeDynamicData
- *				NiTriStripsData
- *					NiTriStripsDynamicData
- *			NiLinesData
- *			NiParticlesData
- *				NiParticleMeshesData
- *				NiPSysData
- *					BSStripPSysData
- *					NiMeshPSysData
  *		NiExtraData
  *			BSSplatterExtraData
  *			BGSAddonNodeSoundHandleExtra
  *			BSFaceGenAnimationData
  *			BSFaceGenModelExtraData
  *			BSFaceGenBaseMorphExtraData
- *			DebugTextExtraData
- *			NiTextKeyExtraData
  *			NiStringsExtraData
  *			NiStringExtraData
- *			NiFloatsExtraData
- *			NiColorExtraData
  *			NiVertWeightsExtraData
- *			NiVectorExtraData
- *			NiSwitchStringExtraData
- *			NiIntegersExtraData
- *				BSWArray
+ *			NiBinaryExtraData
+ *			NiBooleanExtraData
+ *				BSDistantObjectLargeRefExtraData
+ *			NiColorExtraData
+ *			NiFloatExtraData
+ *			NiFloatsExtraData
  *			NiIntegerExtraData
  *				BSXFlags
  *				BSDecalPlacementVectorExtraData
- *			NiFloatExtraData
- *			NiBooleanExtraData
- *			NiBinaryExtraData
+ *			NiIntegersExtraData
+ *				BSWArray
+ *			NiSwitchStringExtraData
+ *			NiVectorExtraData
+ *			NiTextKeyExtraData
  *			PArrayPoint
  *			BSBodyMorphOffsetsExtraData
  *			BSBehaviorGraphExtraData
@@ -253,86 +188,135 @@
  *			BSBoneMap
  *			BSAnimInteractionMarker
  *			BSInvMarker
- *			BSNonUniformScaleExtraData
  *			BSBoneLODExtraData
+ *			BSNonUniformScaleExtraData
  *			bhkRagdollTemplate
  *			bhkExtraData
- *			BSTextureData
+ *			DebugTextExtraData
+ *		NiGeometryData
+ *			NiTriBasedGeomData
+ *				NiTriShapeData
+ *				NiTriStripsData
  *		NiTexture
  *			NiSourceTexture
- *				NiSourceCubeMap
- *			NiDX9Direct3DTexture
- *			NiRenderedTexture
- *				NiRenderedCubeMap
- *		NiPixelData
  *		NiSkinPartition
- *		NiSkinData
  *		NiSkinInstance
  *		NiAVObjectPalette
  *			NiDefaultAVObjectPalette
- *		NiPalette
- *		NiPersistentSrcTextureRendererData
- *			NiDX9PersistentSrcTextureRendererData
+ *		NiSkinData
+ *		NiParticlesData
+ *			NiParticleMeshesData
+ *			NiPSysData
+ *				NiMeshPSysData
+ *				BSStripPSysData
+ *		NiAdditionalGeometryData
  *		NiAccumulator
  *			NiBackToFrontAccumulator
  *				NiAlphaAccumulator
  *					BSShaderAccumulator
+ *		NiControllerSequence
+ *			BSAnimGroupSequence
+ *		NiFloatData
+ *		NiColorData
+ *		NiInterpolator
+ *			NiBlendInterpolator
+ *				NiBlendTransformInterpolator
+ *				NiBlendFloatInterpolator
+ *				NiBlendAccumTransformInterpolator
+ *				BSBlendTreadTransfInterpolator
+ *				NiBlendBoolInterpolator
+ *				NiBlendColorInterpolator
+ *				NiBlendPoint3Interpolator
+ *				NiBlendQuaternionInterpolator
+ *			NiKeyBasedInterpolator
+ *				NiFloatInterpolator
+ *				NiColorInterpolator
+ *				NiTransformInterpolator
+ *					BSRotAccumTransfInterpolator
+ *				NiPathInterpolator
+ *				NiBoolInterpolator
+ *					NiBoolTimelineInterpolator
+ *				NiPoint3Interpolator
+ *				NiQuaternionInterpolator
+ *				BSTreadTransfInterpolator
+ *			NiLookAtInterpolator
+ *			NiBSplineInterpolator
+ *				NiBSplineColorInterpolator
+ *					NiBSplineCompColorInterpolator
+ *				NiBSplineFloatInterpolator
+ *					NiBSplineCompFloatInterpolator
+ *				NiBSplinePoint3Interpolator
+ *					NiBSplineCompPoint3Interpolator
+ *				NiBSplineTransformInterpolator
+ *					NiBSplineCompTransformInterpolator
+ *		NiTransformData
+ *		NiPosData
+ *		NiBoolData
+ *		NiBSplineBasisData
+ *		NiBSplineData
+ *		NiMorphData
+ *		NiRotData
+ *		NiSequence
+ *		NiStringPalette
+ *		NiUVData
+ *		BSAnimNote
+ *			BSGrabIKNote
+ *			BSLookIKNote
+ *		BSAnimNotes
+ *		NiPSysModifier
+ *			NiPSysGravityModifier
+ *			NiPSysEmitter
+ *				NiPSysMeshEmitter
+ *				NiPSysVolumeEmitter
+ *					NiPSysCylinderEmitter
+ *					NiPSysBoxEmitter
+ *					NiPSysSphereEmitter
+ *					BSPSysArrayEmitter
+ *			NiPSysMeshUpdateModifier
+ *				BSPSysHavokUpdateModifier
+ *			NiPSysAgeDeathModifier
+ *			NiPSysBombModifier
+ *			NiPSysBoundUpdateModifier
+ *			NiPSysColliderManager
+ *			NiPSysColorModifier
+ *			NiPSysDragModifier
+ *			NiPSysGrowFadeModifier
+ *			NiPSysPositionModifier
+ *			NiPSysRotationModifier
+ *			NiPSysSpawnModifier
+ *			BSPSysRecycleBoundModifier
+ *			BSPSysInheritVelocityModifier
+ *			NiPSysFieldModifier
+ *				NiPSysAirFieldModifier
+ *				NiPSysDragFieldModifier
+ *				NiPSysGravityFieldModifier
+ *				NiPSysRadialFieldModifier
+ *				NiPSysTurbulenceFieldModifier
+ *				NiPSysVortexFieldModifier
+ *			BSWindModifier
+ *			BSParentVelocityModifier
+ *			BSPSysStripUpdateModifier
+ *			BSPSysSubTexModifier
+ *			BSPSysScaleModifier
+ *			BSPSysSimpleColorModifier
+ *			BSPSysLODModifier
+ *		NiPSysEmitterCtlrData
+ *		NiPSysCollider
+ *			NiPSysPlanarCollider
+ *			NiPSysSphericalCollider
  *		BSMultiBound
  *		BSMultiBoundRoom
  *		BSOcclusionShape
- *		BSOcclusionPlane
- *			BSPortal
  *		BSMultiBoundShape
  *			BSMultiBoundAABB
  *				BSMultiBoundOBB
  *			BSMultiBoundSphere
  *			BSMultiBoundCapsule
  *		BSOcclusionBox
+ *		BSOcclusionPlane
+ *			BSPortal
  *		BSReference
  *		BSNodeReferences
- *		BSTextureSet
- *			BSShaderTextureSet
- *		NiPSysModifier
- *			BSWindModifier
- *			BSPSysScaleModifier
- *			BSPSysSubTexModifier
- *			BSPSysStripUpdateModifier
- *			BSParentVelocityModifier
- *			BSPSysLODModifier
- *			BSPSysSimpleColorModifier
- *			NiPSysGravityModifier
- *			NiPSysEmitter
- *				NiPSysVolumeEmitter
- *					BSPSysArrayEmitter
- *					NiPSysCylinderEmitter
- *					NiPSysSphereEmitter
- *					NiPSysBoxEmitter
- *				NiPSysMeshEmitter
- *			NiPSysMeshUpdateModifier
- *				BSPSysHavokUpdateModifier
- *			BSPSysInheritVelocityModifier
- *			BSPSysRecycleBoundModifier
- *			NiPSysSpawnModifier
- *			NiPSysRotationModifier
- *			NiPSysPositionModifier
- *			NiPSysGrowFadeModifier
- *			NiPSysDragModifier
- *			NiPSysColorModifier
- *			NiPSysColliderManager
- *			NiPSysBoundUpdateModifier
- *			NiPSysBombModifier
- *			NiPSysAgeDeathModifier
- *			NiPSysFieldModifier
- *				NiPSysVortexFieldModifier
- *				NiPSysTurbulenceFieldModifier
- *				NiPSysRadialFieldModifier
- *				NiPSysGravityFieldModifier
- *				NiPSysDragFieldModifier
- *				NiPSysAirFieldModifier
- *		NiPSysEmitterCtlrData
- *		NiPSysCollider
- *			NiPSysSphericalCollider
- *			NiPSysPlanarCollider
  *		bhkRefObject
  *			bhkWorld
  *				bhkWorldM
@@ -342,52 +326,52 @@
  *						bhkRigidBody
  *							bhkRigidBodyT
  *					bhkPhantom
+ *						bhkAabbPhantom
+ *							bhkAutoWater
+ *							bhkAvoidBox
  *						bhkShapePhantom
  *							bhkSimpleShapePhantom
  *								bhkCollisionBox
  *							bhkCachingShapePhantom
- *						bhkAabbPhantom
- *							bhkAutoWater
- *							bhkAvoidBox
  *				bhkShape
  *					bhkSphereRepShape
  *						bhkConvexShape
+ *							bhkCapsuleShape
  *							bhkBoxShape
  *							bhkSphereShape
- *							bhkCapsuleShape
- *							bhkTriangleShape
- *							bhkCylinderShape
+ *							bhkConvexSweepShape
+ *							bhkConvexTransformShape
+ *							bhkConvexTranslateShape
  *							bhkConvexVerticesShape
  *								bhkCharControllerShape
- *							bhkConvexTranslateShape
- *							bhkConvexTransformShape
- *							bhkConvexSweepShape
+ *							bhkCylinderShape
+ *							bhkTriangleShape
  *						bhkMultiSphereShape
  *					bhkBvTreeShape
  *						bhkTriSampledHeightFieldBvTreeShape
  *						bhkMoppBvTreeShape
  *					bhkTransformShape
  *					bhkShapeCollection
- *						bhkPackedNiTriStripsShape
  *						bhkNiTriStripsShape
- *						bhkListShape
+ *						bhkPackedNiTriStripsShape
  *						bhkCompressedMeshShape
+ *						bhkListShape
  *					bhkHeightFieldShape
  *						bhkPlaneShape
  *				bhkConstraint
- *					bhkMalleableConstraint
  *					bhkLimitedHingeConstraint
+ *					bhkMalleableConstraint
  *					bhkPrismaticConstraint
  *					bhkHingeConstraint
- *					bhkGroupConstraint
- *					bhkBreakableConstraint
- *					bhkWheelConstraint
- *					bhkStiffSpringConstraint
- *					bhkRagdollLimitsConstraint
- *					bhkRagdollConstraint
- *					bhkHingeLimitsConstraint
- *					bhkBallSocketConstraintChain
  *					bhkBallAndSocketConstraint
+ *					bhkBallSocketConstraintChain
+ *					bhkGroupConstraint
+ *					bhkHingeLimitsConstraint
+ *					bhkRagdollConstraint
+ *					bhkRagdollLimitsConstraint
+ *					bhkStiffSpringConstraint
+ *					bhkWheelConstraint
+ *					bhkBreakableConstraint
  *					bhkGenericConstraint
  *						bhkFixedConstraint
  *					bhkConstraintChain
@@ -397,24 +381,23 @@
  *						bhkTiltPreventAction
  *						bhkWheelAction
  *						bhkMouseSpringAction
- *						bhkOrientHingedBodyAction
- *						bhkMotorAction
  *						bhkLiquidAction
+ *						bhkMotorAction
+ *						bhkOrientHingedBodyAction
  *					bhkBinaryAction
- *						bhkSpringAction
- *						bhkDashpotAction
  *						bhkAngularDashpotAction
- *				bhkCharacterRigidBody
+ *						bhkDashpotAction
+ *						bhkSpringAction
  *				bhkCharacterProxy
+ *				bhkCharacterRigidBody
  *		hkPackedNiTriStripsData
  *		bhkRagdollTemplateData
- *		bhkPoseArray
  *		bhkCompressedMeshShapeData
- *		NiRenderTargetGroup
- *		NiShaderDeclaration
- *		Ni2DBuffer
- *			NiDepthStencilBuffer
+ *		bhkPoseArray
+ *		BSTextureSet
+ *			BSShaderTextureSet
  *		NiCollisionObject
+ *			NiCollisionData
  *			bhkNiCollisionObject
  *				bhkCollisionObject
  *					bhkCartTether
@@ -423,42 +406,18 @@
  *						WeaponObject
  *				bhkPCollisionObject
  *					bhkSPCollisionObject
- *			NiCollisionData
- *	
+ *
  *	NiCullingProcess
  *		BSCullingProcess
  *			BSGeometryListCullingProcess
  *			BSParabolicCullingProcess
  *		BSFadeNodeCuller
- *	
- *	BSShader
- *		BSGrassShader
- *		BSBloodSplatterShader
- *		BSLightingShader
- *		BSSkyShader
- *		BSEffectShader
- *		BSDistantTreeShader
- *		BSWaterShader
- *		BSUtilityShader
- *		BSParticleShader
- *		BSImagespaceShader
- *	
- *	NiDX92DBufferData
- *		NiDX9TextureBufferData
- *		NiDX9DepthStencilBufferData
- *			NiDX9ImplicitDepthStencilBufferData
- *			NiDX9Direct3DDepthStencilBufferData
- *			NiDX9AdditionalDepthStencilBufferData
- *			NiDX9SwapChainDepthStencilBufferData
- *		NiDX9OnscreenBufferData
- *			NiDX9ImplicitBufferData
- *			NiDX9SwapChainBufferData
- *	
- *	bhkSpringDamperConstraintMotor
- *	
- *	bhkVelocityConstraintMotor
- *	
+ *
  *	bhkPositionConstraintMotor
+ *
+ *	bhkVelocityConstraintMotor
+ *
+ *	bhkSpringDamperConstraintMotor
  *	
  ****/
 
@@ -761,7 +720,6 @@ extern const NiRTTI *	NiRTTI_BSPSysSubTexModifier;
 extern const NiRTTI *	NiRTTI_BSPSysScaleModifier;
 extern const NiRTTI *	NiRTTI_BSLagBoneController;
 extern const NiRTTI *	NiRTTI_BSNonUniformScaleExtraData;
-extern const NiRTTI *	NiRTTI_BSMeshLODTriShape;
 extern const NiRTTI *	NiRTTI_BSNiNode;
 extern const NiRTTI *	NiRTTI_BSInstanceTriShape;
 extern const NiRTTI *	NiRTTI_bhkWorldObject;
@@ -771,6 +729,7 @@ extern const NiRTTI *	NiRTTI_bhkCollisionObject;
 extern const NiRTTI *	NiRTTI_bhkNiCollisionObject;
 extern const NiRTTI *	NiRTTI_bhkAttachmentCollisionObject;
 extern const NiRTTI *	NiRTTI_WeaponObject;
+extern const NiRTTI *	NiRTTI_bhkRigidBodyT;
 extern const NiRTTI *	NiRTTI_bhkWorldM;
 extern const NiRTTI *	NiRTTI_bhkRefObject;
 extern const NiRTTI *	NiRTTI_bhkSerializable;
@@ -790,7 +749,6 @@ extern const NiRTTI *	NiRTTI_bhkSphereShape;
 extern const NiRTTI *	NiRTTI_bhkBvTreeShape;
 extern const NiRTTI *	NiRTTI_bhkNiTriStripsShape;
 extern const NiRTTI *	NiRTTI_bhkPackedNiTriStripsShape;
-extern const NiRTTI *	NiRTTI_bhkRigidBodyT;
 extern const NiRTTI *	NiRTTI_bhkBlendCollisionObject;
 extern const NiRTTI *	NiRTTI_bhkAvoidBox;
 extern const NiRTTI *	NiRTTI_bhkLimitedHingeConstraint;
@@ -886,5 +844,6 @@ extern const NiRTTI *	NiRTTI_BSNiAlphaPropertyTestRefController;
 extern const NiRTTI *	NiRTTI_BSPSysSimpleColorModifier;
 extern const NiRTTI *	NiRTTI_BSPSysLODModifier;
 extern const NiRTTI *	NiRTTI_BSParabolicCullingProcess;
+extern const NiRTTI *	NiRTTI_BSMeshLODTriShape;
 extern const NiRTTI *	NiRTTI_BSLODMultiIndexTriShape;
 extern const NiRTTI *	NiRTTI_BSSubIndexLandTriShape;

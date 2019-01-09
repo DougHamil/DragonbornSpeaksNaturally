@@ -164,38 +164,30 @@ class BSLightingShaderProperty : public BSShaderProperty
 public:
 	virtual ~BSLightingShaderProperty();
 
-	UInt32	unk40;	// 40
-	UInt32	unk48;	// 48
-	UInt32	unk4C;	// 4C
-	UInt32	unk50;	// 50
-	UInt32	unk54;	// 54
-	UInt32	unk58;	// 58
-	NiColor	* emissiveColor;	// 5C
-	float	emissiveMultiple;	// 60
-	UInt32	unk64;	// 64
-	float	unk68;	// 68
-	float	unk6C;	// 6C
-	UInt32	unk70;	// 70
-	UInt32	unk74;	// 74
-	UInt32	unk78;	// 78
-	UInt32	unk7C;	// 7C
-	float	unk80;	// 80
-	float	unk84;	// 84
-	float	unk88;	// 88
-	float	unk8C;	// 8C
-	SInt32	unk90;	// 90 inited to -1
-	SInt16	unk94;	// 94 inited to -1
-	UInt8	unk96;	// 96 inited to 1
-	UInt8	unk97;	// 97 inited to 2
-	UInt32	unk98;	// 98
-	UInt32	unk9C;	// 9C
-	UInt32	unkA0;	// A0
-	SInt32	unkA4;	// A4 inited to -1
-	UInt32	unkA8;	// A8 inited to 0
-	UInt8	unkAC;	// AC inited to 0
-	UInt8	padAD[3];	// AD
-
-	MEMBER_FN_PREFIX(BSLightingShaderProperty);
+	UInt64	unk88[(0xF0 - 0x88) >> 3];
+	NiColor	* emissiveColor;	// F0
+	float	emissiveMultiple;	// F8
+	float	unk100;				// 100
+	float	unk104;				// 104
+	float	unk108;				// 108
+	UInt32	unk10C;				// 10C
+	UInt64	unk110;				// 110
+	UInt32	unk118;				// 118
+	float	unk11C;				// 11C
+	float	unk120;				// 120
+	float	unk124;				// 124
+	float	unk128;				// 128
+	SInt16	unk12C;				// 12C
+	UInt32	unk130;				// 130
+	void	* unk138;			// 138
+	UInt32	unk140;				// 140
+	float	unk144;				// 144
+	UInt32	unk148;				// 148
+	float	unk14C;				// 14C
+	SInt32	unk150;				// 150
+	UInt32	unk154;				// 154
+	UInt8	unk158;				// 158
+	UInt8	pad159[7];			// 159
 
 	bool HasFlags(UInt8 flag)
 	{
@@ -204,9 +196,11 @@ public:
 
 	// This function seems to fix weird lighting issues when creating armors internally
 	// Not particularly sure what it does but it seems to mess around with a lot material flags
-	DEFINE_MEMBER_FN(InitializeShader, UInt32, 0x01303AC0, BSGeometry * geometry);
-	DEFINE_MEMBER_FN(SetMaterial, UInt32, 0x012CA650, BSLightingShaderMaterial * material, bool unk1); // unk1 usually 1
-	DEFINE_MEMBER_FN(SetFlags, UInt64, 0x012CA540, UInt8 unk1, UInt8 unk2);
-	DEFINE_MEMBER_FN(InvalidateMaterial, bool, 0x001AC0E0);
-	DEFINE_MEMBER_FN(InvalidateTextures, void, 0x01303EA0, UInt32 unk1); // unk1 usually 0, called after material Releases textures
+	MEMBER_FN_PREFIX(BSLightingShaderProperty);
+	DEFINE_MEMBER_FN(InitializeShader, UInt32, 0x012DCAA0, BSGeometry * geometry);
+	DEFINE_MEMBER_FN(SetMaterial, UInt32, 0x012A9110, BSLightingShaderMaterial * material, bool unk1); // unk1 usually 1
+	DEFINE_MEMBER_FN(SetFlags, UInt64, 0x012A9000, UInt8 unk1, UInt8 unk2);
+	DEFINE_MEMBER_FN(InvalidateMaterial, bool, 0x0019C5A0);
+	DEFINE_MEMBER_FN(InvalidateTextures, void, 0x012DCE80, UInt32 unk1); // unk1 usually 0, called after material Releases textures
 };
+STATIC_ASSERT(offsetof(BSLightingShaderProperty, emissiveColor) == 0xF0);

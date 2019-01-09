@@ -20,6 +20,8 @@ class InventoryEntryData;
 class UIDelegate;
 class UIDelegate_v1;
 
+class UIMessage;
+
 //// menu implementations
 
 // 30
@@ -53,7 +55,7 @@ public:
 	virtual void	Accept(CallbackProcessor * processor) {}
 	virtual void	Unk_02(void) {}
 	virtual void	Unk_03(void) {}
-	virtual UInt32	ProcessUnkData1(UnkData1* data);
+	virtual UInt32	ProcessMessage(UIMessage* message) { return CALL_MEMBER_FN(this, ProcessMessage_internal)(message); }
 	virtual void	NextFrame(UInt32 arg0, UInt32 arg1) { CALL_MEMBER_FN(this, NextFrame_internal)(arg0, arg1); }
 	virtual void	Render(void);
 	virtual void	Unk_07(void) {}
@@ -68,9 +70,10 @@ public:
 	GRefCountBase	* unk18;	// 28 - holds a reference
 
 	MEMBER_FN_PREFIX(IMenu);
-	DEFINE_MEMBER_FN(InitMovie_internal, void, 0x00F2A510, GFxMovieView* view);
-	DEFINE_MEMBER_FN(NextFrame_internal, void, 0x00F2A440, UInt32 arg0, UInt32 arg1);
-	DEFINE_MEMBER_FN(dtor, void, 0x00F2A380);
+	DEFINE_MEMBER_FN(InitMovie_internal, void, 0x00ECD6B0, GFxMovieView* view);
+	DEFINE_MEMBER_FN(NextFrame_internal, void, 0x00ECD5E0, UInt32 arg0, UInt32 arg1);
+	DEFINE_MEMBER_FN(ProcessMessage_internal, UInt32, 0x00ECD590, UIMessage* message);
+	DEFINE_MEMBER_FN(dtor, void, 0x00ECD530);
 };
 STATIC_ASSERT(offsetof(IMenu, view) == 0x10);
 
@@ -221,8 +224,8 @@ public:
 
 
 	MEMBER_FN_PREFIX(RaceSexMenu);
-	// 7E71CF58E263FF290638B08A9859CD3A95C17244+53
-	DEFINE_MEMBER_FN(LoadSliders, void *, 0x008E39B0, UInt64 unk1, UInt8 unk2);
+	// FCFD4B12540A068252C0A71C5480E518DDF6EF60+58
+	DEFINE_MEMBER_FN(LoadSliders, void *, 0x008B6010, UInt64 unk1, UInt8 unk2);
 };
 STATIC_ASSERT(offsetof(RaceSexMenu, sliderData) == 0x140);
 STATIC_ASSERT(offsetof(RaceSexMenu, raceIndex) == 0x188);
@@ -335,8 +338,8 @@ public:
 	GFxValue		object;		// 10
 
 	MEMBER_FN_PREFIX(HUDObject);
-	DEFINE_MEMBER_FN(dtor, void, 0x0053E4F0);
-	DEFINE_MEMBER_FN(Impl_Fn03, void *, 0x008ADA20, void * unk1);
+	DEFINE_MEMBER_FN(dtor, void, 0x00885E30);
+	DEFINE_MEMBER_FN(Impl_Fn03, void *, 0x00880330, void * unk1);
 
 	DEFINE_STATIC_HEAP(Heap_Allocate, Heap_Free);
 };
@@ -362,12 +365,35 @@ public:
 
 };
 
+// 60
+class Notification
+{
+public:
+	Notification() : type(0), quest(nullptr), word(nullptr), time(0) { }
+	~Notification() { CALL_MEMBER_FN(this, dtor)(); }
+	
+	BSString			text; 	// 00 - size 10
+	BSString			status;	// 10 - size 10
+	BSFixedString	sound;	// 20 - size 08
+	tArray<BSFixedString> objectives; // 28 - size 18
+	UInt64			type;	// 40
+	TESQuest*		quest;	// 48
+	TESWordOfPower*	word;	// 50
+	UInt32			time;	// 58 - g_gameTime + iObjectivesWaitTime
+
+	MEMBER_FN_PREFIX(Notification);
+	DEFINE_MEMBER_FN(dtor, void, 0x008855F0);
+};
+
 // 78
 class HUDNotifications : public HUDObject
 {
 public:
-
-	UInt8	todo[0x78 - 0x28];	// 28
+	tArray<Notification> queue; // 28 - size 18
+	GFxValue		object;	// 40 - size 18 - .Invoke("CanShowNotification")
+	GFxValue		array;	// 58 - size 18 - .GetType() == 7
+	UInt32		time;	// 70 - last meter update time
+	float		points;	// 74 - cached meter progress
 };
 
 // 88
@@ -510,7 +536,7 @@ public:
 		UInt8		pad12[6];	// 12
 
 		MEMBER_FN_PREFIX(CategoryListEntry);
-		DEFINE_MEMBER_FN(SetData, void, 0x0089A6C0, GFxValue* target);
+		DEFINE_MEMBER_FN(SetData, void, 0x0086F320, GFxValue* target);
 
 		void SetData_Extended(EnchantConstructMenu*	subMenu, GFxValue* target);
 	};
@@ -641,6 +667,53 @@ public:
 	UInt32	pad14;		// 14
 };
 
+class HUDData : public IUIMessageData
+{
+public:
+	enum MessageType
+	{
+		kType_ShowMessage = 1,
+		kType_SetCrosshairTarget = 3,
+		kType_SetLoadDoorInfo = 4,
+		kType_ShowSubtitle = 5,
+		kType_HideSubtitle = 6,
+		kType_ShowArrowCount = 7,
+		kType_HideArrowCount = 8,
+		kType_SetSubtitlesEnabled = 9,
+		kType_QuestStarted = 14,
+		kType_QuestCompleted = 15,
+		kType_QuestUpdated = 16,
+		kType_NewObjective = 17,
+		kType_ObjectiveCompleted = 18,
+		kType_ObjectiveFailed = 19,
+		kType_SkillIncreased = 20,
+		kType_WorldOfPowerLearned = 21,
+		kType_DragonSoulAbsorbed = 22,
+		kType_ShowElements = 23,
+		kType_LocationDiscoverd = 26,
+		kType_Favor = 27,
+		kType_ValidateCrosshair = 28,
+		kType_SetLocationName = 29,
+		kType_ShowTutrialHintText = 30,
+		kType_SetCrosshairEnabled = 31,
+		kType_Unk32 = 32,
+		kType_RefreshActivateButtonArt = 33,
+		kType_Unk34 = 34	
+
+	};
+
+	UInt32			type;	// 10
+	UInt8			pad14[4]; // or UInt64 with 'type'?
+	BSString			text;	// 18 - size 10
+	void	*			unk14;	// 28 - size 8
+	TESQuest*		quest;	// 30 - size 8
+	TESWordOfPower*	word;	// 38 - size 8
+	bool				unk40;	// 40 - some flag
+	UInt8			pad41[3];
+	UInt32			unk44;	// 44 - location type
+
+};
+
 typedef void * (*_CreateUIMessageData)(BSFixedString * name);
 extern RelocAddr<_CreateUIMessageData> CreateUIMessageData;
 
@@ -739,12 +812,13 @@ public:
 	// this takes ownership of the message ptr
 //	DEFINE_MEMBER_FN(AddMessage, void, 0x004503E0, UIMessage * msg);	// old 1.1 implementation
 	// 1.3 uses a little non-thread-safe pool of UIMessages to wrap around the nicely thread-safe BSTMessageQueue it gets added to
-	DEFINE_MEMBER_FN(AddMessage, void, 0x00175A10, StringCache::Ref * strData, UInt32 msgID, void * objData);
+	DEFINE_MEMBER_FN(AddMessage, void, 0x001654C0, StringCache::Ref * strData, UInt32 msgID, void * objData);
+	DEFINE_MEMBER_FN(CreateUIMessageData, IUIMessageData *, 0x00EC2F10, const BSFixedString &type);
 
 	static UIManager *	GetSingleton(void)
 	{
 		// CB598A8812CFF3959F94DC8F8371BA876F68AE34+67
-		static RelocPtr<UIManager*> g_UIManager(0x01F850F8);
+		static RelocPtr<UIManager*> g_UIManager(0x01EE7A70);
 		return *g_UIManager;
 	}
 
@@ -753,7 +827,7 @@ public:
 	void QueueCommand(UIDelegate* cmd);
 	void QueueCommand(UIDelegate_v1* cmd);
 
-	DEFINE_MEMBER_FN(ProcessEventQueue_HookTarget, void, 0x00F1FBC0);
+	DEFINE_MEMBER_FN(ProcessEventQueue_HookTarget, void, 0x00EC2E30);
 };
 STATIC_ASSERT(offsetof(UIManager, pad348) == 0x348);
 STATIC_ASSERT(sizeof(UIManager) == 0xB80);
@@ -841,7 +915,7 @@ public:
 	static UIStringHolder *	GetSingleton(void)
 	{
 		// 81B349AB8ABC9944E48046819F0345AB0526CDB5+9
-		static RelocPtr<UIStringHolder *> g_UIStringHolder(0x01F85100);
+		static RelocPtr<UIStringHolder *> g_UIStringHolder(0x01EE7A78);
 		return *g_UIStringHolder;
 	}
 };
@@ -854,8 +928,8 @@ public:
 
 	static Inventory3DManager * GetSingleton(void)
 	{
-		// 59347F2939D95BA10F7C25036702DA321C7D56F1+87
-		static RelocPtr<Inventory3DManager*> g_inventory3DManager(0x02FEBC80);
+		// 6BC34CC398831C8B8BE5BE20EC213B5BE7C47A7A+2E
+		static RelocPtr<Inventory3DManager*> g_inventory3DManager(0x02F4E180);
 		return *g_inventory3DManager;
 	}
 
@@ -894,10 +968,10 @@ public:
 	UInt8			pad15B[5];
 
 	MEMBER_FN_PREFIX(Inventory3DManager);
-	DEFINE_MEMBER_FN(UpdateItem3D, void, 0x008B4EA0, InventoryEntryData * objDesc);
-	DEFINE_MEMBER_FN(UpdateMagic3D, void, 0x008B4ED0, TESForm * form, UInt32 unk1);
-	DEFINE_MEMBER_FN(Clear3D, void, 0x008B5240);
-	DEFINE_MEMBER_FN(Render, UInt32, 0x008B4C90);
+	DEFINE_MEMBER_FN(UpdateItem3D, void, 0x00887B60, InventoryEntryData * objDesc);
+	DEFINE_MEMBER_FN(UpdateMagic3D, void, 0x00887B90, TESForm * form, UInt32 unk1);
+	DEFINE_MEMBER_FN(Clear3D, void, 0x00887F00);
+	DEFINE_MEMBER_FN(Render, UInt32, 0x00887940);
 
 	//DEFINE_MEMBER_FN(Unk1, void, 0x008667E0, UInt32 unk1);
 	//DEFINE_MEMBER_FN(Unk2, void, 0x00867110);
@@ -989,22 +1063,21 @@ public:
 	bool				showMenus;					// 1C0 (= 0)
 	bool				unk_1C1;					// 1C1 (= 0)
 	char				pad[6];						// 1C2
-private:
 
 public:
 	typedef IMenu*	(*CreatorFunc)(void);
 
 private:
 	MEMBER_FN_PREFIX(MenuManager);
-	DEFINE_MEMBER_FN(IsMenuOpen, bool, 0x00F1A3B0, BSFixedString * menuName);
-	DEFINE_MEMBER_FN(Register_internal, void, 0x00F1BE20, const char * name, CreatorFunc creator);
+	DEFINE_MEMBER_FN(IsMenuOpen, bool, 0x00EBDE90, BSFixedString * menuName);
+	DEFINE_MEMBER_FN(Register_internal, void, 0x00EBF700, const char * name, CreatorFunc creator);
 
 public:
 
 	static MenuManager * GetSingleton(void)
 	{
 		// 502FDB8FEA80C3705F9E228F79D4EA7A399CC7FD+32
-		static RelocPtr<MenuManager *> g_menuManager(0x01F83200);
+		static RelocPtr<MenuManager *> g_menuManager(0x01EE5B20);
 		return *g_menuManager;
 	}
 

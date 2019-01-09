@@ -78,10 +78,9 @@ public:
 	void	Release(void);
 
 	MEMBER_FN_PREFIX(VMClassInfo);
-	DEFINE_MEMBER_FN(Destroy, void, 0x0126F6F0);
-	DEFINE_MEMBER_FN(GetVariable, SInt32, 0x01270A60, BSFixedString * name);
-	// 1673D04F90861710999A3DC0514282C538D25FCA+187
-	DEFINE_MEMBER_FN(GetFunction, IFunction*, 0x01274C10, const char * fnName);
+	DEFINE_MEMBER_FN(Destroy, void, 0x0124E610);
+	DEFINE_MEMBER_FN(GetVariable, SInt32, 0x0124F980, BSFixedString * name);
+	DEFINE_MEMBER_FN(GetFunction, IFunction*, 0x01253B30, const char * fnName);
 };
 
 // This type is not fully decoded or correctly sized, just enough to use the functor
@@ -200,7 +199,6 @@ public:
 
 // 4B04
 // this does more than hold on to class registrations, but for now that's all we care about
-// ??_7VirtualMachine@Internal@BSScript@@6B@
 class VMClassRegistry
 {
 public:
@@ -251,8 +249,6 @@ public:
 	virtual void	SetFunctionFlagsEx(const char * className, UInt32 unk0, const char * fnName, UInt32 flags);
 	virtual void	SetFunctionFlags(const char * className, const char * fnName, UInt32 flags);
 	virtual void	VisitScripts(UInt64 handle, IForEachScriptObjectFunctor * functor);
-	virtual void	New_1C(void);	// added in VR 1.4.15
-	virtual void	New_1D(void);	// added in VR 1.4.15
 	virtual bool	Unk_1C(UInt64 handle, const char * className, VMIdentifier ** identifier);
 	virtual void	Unk_1D(void);
 	virtual void	Unk_1E(void);
@@ -397,15 +393,15 @@ public:
 
 	// Used by Hooks_Papyrus
 	// 7B34FD8669F3B7848943EE6F26F783A154F6A336+31
-	DEFINE_MEMBER_FN(UnregisterFromSleep_Internal, void, 0x0095F230, UInt64 handle);
-	DEFINE_MEMBER_FN(RevertGlobalData_Internal, bool, 0x00968130);
+	DEFINE_MEMBER_FN(UnregisterFromSleep_Internal, void, 0x009249D0, UInt64 handle);
+	DEFINE_MEMBER_FN(RevertGlobalData_Internal, bool, 0x0092DCD0);
 	// E79F47684196468F785E6950402DBDAA5A668FAA+110
-	DEFINE_MEMBER_FN(SaveRegSleepEventHandles_Internal, bool, 0x009691A0, void * handleReaderWriter, void * saveStorageWrapper);
+	DEFINE_MEMBER_FN(SaveRegSleepEventHandles_Internal, bool, 0x0092ED40, void * handleReaderWriter, void * saveStorageWrapper);
 	// ECCDB3740458A9BB07FA958498C66F04CE14F94C+1E6
-	DEFINE_MEMBER_FN(LoadRegSleepEventHandles_Internal, bool, 0x0096A3D0, void * handleReaderWriter, void * loadStorageWrapper);
+	DEFINE_MEMBER_FN(LoadRegSleepEventHandles_Internal, bool, 0x0092FF70, void * handleReaderWriter, void * loadStorageWrapper);
 
 	// 00011FEFBFDA69F253C84165B45736A4F0AF02B8+204
-	DEFINE_MEMBER_FN(QueueDelayFunctor_Internal, bool, 0x0095FD10, void** pFunctor);
+	DEFINE_MEMBER_FN(QueueDelayFunctor_Internal, bool, 0x009254B0, void** pFunctor);
 
 	bool QueueDelayFunctor(void** pFunctor)
 	{
@@ -443,7 +439,7 @@ public:
 		VMValue	* Get(UInt32 idx)	{ return (idx < m_size) ? &m_data[idx] : NULL; }
 
 		MEMBER_FN_PREFIX(Output);
-		DEFINE_MEMBER_FN(Resize, bool, 0x0095AA60, UInt32 len);
+		DEFINE_MEMBER_FN(Resize, bool, 0x00920550, UInt32 len);
 	};
 
 	virtual bool	Copy(Output * dst) = 0;

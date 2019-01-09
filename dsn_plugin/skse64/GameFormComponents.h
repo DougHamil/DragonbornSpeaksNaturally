@@ -471,7 +471,7 @@ public:
 	UInt32	unk0C;	// 0C - init'd to FFFFFFFF
 
 	MEMBER_FN_PREFIX(TESDescription);
-	DEFINE_MEMBER_FN(Get, void, 0x001A01B0, BSString * out, TESForm * parent, UInt32 fieldType);
+	DEFINE_MEMBER_FN(Get, void, 0x00190670, BSString * out, TESForm * parent, UInt32 fieldType);
 };
 
 // 18 
@@ -1051,8 +1051,8 @@ public:
 	void	* unk10;	// 10
 
 	MEMBER_FN_PREFIX(ActorWeightData);
-	DEFINE_MEMBER_FN(UpdateWeightData, void, 0x001D6530);
-	DEFINE_MEMBER_FN(DeleteThis, void, 0x001D6200);
+	DEFINE_MEMBER_FN(UpdateWeightData, void, 0x001C6390);
+	DEFINE_MEMBER_FN(DeleteThis, void, 0x001C6290);
 };
 
 // ??
@@ -1280,10 +1280,10 @@ public:
 	UInt32	pad13C;						// 13C
 
 	MEMBER_FN_PREFIX(ActorProcessManager);
-	DEFINE_MEMBER_FN(SetEquipFlag, void, 0x00687830, UInt8 flags);
-	DEFINE_MEMBER_FN(UpdateEquipment, void, 0x0065A140, Actor * actor);
+	DEFINE_MEMBER_FN(SetEquipFlag, void, 0x0067E5A0, UInt8 flags);
+	DEFINE_MEMBER_FN(UpdateEquipment, void, 0x00650FE0, Actor * actor);
 	// FBB0A4AE04B0C1C63470C26B004079D7D9B20D0B+8B
-	DEFINE_MEMBER_FN(SetDataFlag, void, 0x00665BD0, float flag); // Sets a number on the 0x10 object. SE: The parameter flag was actually a float (xmm1)
+	DEFINE_MEMBER_FN(SetDataFlag, void, 0x0065CA70, float flag); // Sets a number on the 0x10 object. SE: The parameter flag was actually a float (xmm1)
 
 	void UpdateEquipment_Hooked(Actor * actor);
 };
@@ -1367,9 +1367,9 @@ public:
 	void SetSkillLegendaryLevel(BSFixedString actorValue, UInt32 level);
 
 	MEMBER_FN_PREFIX(PlayerSkills);
-	DEFINE_MEMBER_FN(GetSkillData, UInt32, 0x0070D020, UInt32 actorValue, float * level, float * points, float * pointsMax, UInt32 * unk6);
-	DEFINE_MEMBER_FN(IncrementLegendary, UInt32, 0x0070D510, UInt32 actorValue);
-	DEFINE_MEMBER_FN(SetLevel, void, 0x0070D4B0, UInt32 level);
+	DEFINE_MEMBER_FN(GetSkillData, UInt32, 0x006E6320, UInt32 actorValue, float * level, float * points, float * pointsMax, UInt32 * unk6);
+	DEFINE_MEMBER_FN(IncrementLegendary, UInt32, 0x006E6810, UInt32 actorValue);
+	DEFINE_MEMBER_FN(SetLevel, void, 0x006E67B0, UInt32 level);
 };
 
 // 10

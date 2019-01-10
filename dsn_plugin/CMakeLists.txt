@@ -7,6 +7,11 @@ project(dsn_plugin)
 # Options
 ###############
 
+# detect architecture (32bit/64bit)
+if(NOT "${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
+  MESSAGE(FATAL_ERROR "The project can only build for x64, please add `-A x64` to your cmake params.")
+endif()
+
 # set C++ standard
 # don't need at current, keep it for future
 #set(CMAKE_CXX_STANDARD 17)
@@ -141,7 +146,6 @@ file(GLOB_RECURSE DSN_PLUGIN_SRC
     dsn_plugin/*.cpp
     dsn_plugin/*.def
     dsn_plugin/*.txt
-    CMakeLists.txt
 )
 
 # for SkyrimVR
@@ -169,3 +173,28 @@ set_target_properties(dsn_plugin_se PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/SkyrimSE"
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/SkyrimSE"
 )
+
+
+###############
+# Install and Package
+###############
+
+if (SVR_DIR)
+    set(SVR_PLUGIN_DIR "${SVR_DIR}/Data/Plugins/Sumwunn")
+    message("-- SkyrimVR plugin install path: ${SVR_PLUGIN_DIR}/")
+
+    install(TARGETS dsn_plugin_vr
+        COMPONENT SkyrimVR
+        RUNTIME DESTINATION ${SVR_PLUGIN_DIR}
+    )
+endif()
+
+if (SSE_DIR)
+    set(SSE_PLUGIN_DIR "${SSE_DIR}/Data/Plugins/Sumwunn")
+    message("-- SkyrimSE plugin install path: ${SSE_PLUGIN_DIR}/")
+
+    install(TARGETS dsn_plugin_se
+        COMPONENT SkyrimSE
+        RUNTIME DESTINATION ${SSE_PLUGIN_DIR}
+    )
+endif()

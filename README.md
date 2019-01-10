@@ -19,6 +19,34 @@ You need a [Visual Studio](https://visualstudio.microsoft.com/) (with `C++ Deskt
 
 Then enter [dsn_plugin](dsn_plugin) directory and double-click `configure.bat`, a Visual Studio project will be created by Cmake and loaded automatically.
 
+### Auto install dlls to game directory after building
+
+When you run `configure.bat` for the first time, you are asked about the installation path of SkyrimVR and SkyrimSE. If you want to enable the automatic installation feature, please provide the root directory of your games. If you want to disable the installation, just press Enter.
+
+An example:
+```
+Set plugin install directories after building:
+SkyrimVR game root path (empty to disable installation): E:/Games/SteamLibrary/steamapps/common/SkyrimVR
+SkyrimSE game root path (empty to disable installation): E:/Games/SteamLibrary/steamapps/common/Skyrim Special Edition
+CMakeFlags: -DSVR_DIR="E:/Games/SteamLibrary/steamapps/common/SkyrimVR" -DSSE_DIR="E:/Games/SteamLibrary/steamapps/common/Skyrim Special Edition"
+```
+
+And these commands will be execute for the example:
+```bat
+md build
+cd build
+cmake -A x64 -DSVR_DIR="E:/Games/SteamLibrary/steamapps/common/SkyrimVR" -DSSE_DIR="E:/Games/SteamLibrary/steamapps/common/Skyrim Special Edition" ..
+start dsn_plugin.sln
+```
+
+A file named `install-path.ini` will be created after the first running of `configure.bat`.
+You can delete it and run `configure.bat` again to reset the path, or edit it directly.
+
+### How the Auto installation works
+
+The installation will execute when you build the project `INSTALL` or use `Build Solution`.
+Building only `dsn_plugin_xx` cannot trigger the auto installation.
+
 ### Directory structure of dsn_plugin
 name          | description
 ------------- | -------------

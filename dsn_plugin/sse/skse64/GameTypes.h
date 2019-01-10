@@ -128,6 +128,7 @@ public:
 
 		MEMBER_FN_PREFIX(Ref);
 		DEFINE_MEMBER_FN(ctor, Ref *, 0x00C28930, const char * buf);
+		DEFINE_MEMBER_FN(ctor_ref, Ref *, 0x00C289C0, const Ref & rhs);
 		DEFINE_MEMBER_FN(Set, Ref *, 0x00C28AA0, const char * buf);
 		// 77D2390F6DC57138CF0E5266EB5BBB0ACABDFBE3+A0
 		DEFINE_MEMBER_FN(Release, void, 0x00C28A80);
@@ -179,7 +180,10 @@ public:
 	BSString() :m_data(NULL), m_dataLen(0), m_bufLen(0) { }
 	~BSString();
 
-	const char *	Get(void);
+	const char *	Get(void) const;
+
+	MEMBER_FN_PREFIX(BSString);
+	DEFINE_MEMBER_FN(Set, bool, 0x000FA080, const char * str, UInt32 len);	// len default 0
 
 private:
 	char	* m_data;	// 00

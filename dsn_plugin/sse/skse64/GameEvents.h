@@ -2,6 +2,7 @@
 
 #include "skse64_common/Utilities.h"
 #include "GameTypes.h"
+#include "GameForms.h"
 
 class TESObjectREFR;
 class Actor;
@@ -154,9 +155,7 @@ struct WordLearned
 {
 	struct Event
 	{
-		UInt32	first; //flag
-		UInt32	unk;
-		TESWordOfPower*	word;
+		bool	 first;
 	};
 };
 
@@ -164,7 +163,7 @@ struct WordUnlocked
 {
 	struct Event
 	{
-		// Unknown
+		bool	 third;
 	};
 };
 
@@ -190,8 +189,8 @@ struct QuestStatus
 {
 	struct Event
 	{
-		UInt32		status;
 		TESQuest*	quest;
+		UInt32		status;
 	};
 };
 
@@ -199,7 +198,9 @@ struct ObjectiveState
 {
 	struct Event
 	{
-		// Unknown
+		TESQuest::Objective* objective;
+		UInt32	oldState;
+		UInt32	newState;
 	};
 };
 
@@ -290,7 +291,8 @@ struct LocationDiscovery
 {
 	struct Event
 	{
-		TESFullName*	 fullname;
+		TESFullName	* name;
+		const char	* world;
 	};
 };
 

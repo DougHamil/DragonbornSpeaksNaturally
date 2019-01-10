@@ -372,8 +372,8 @@ public:
 	Notification() : type(0), quest(nullptr), word(nullptr), time(0) { }
 	~Notification() { CALL_MEMBER_FN(this, dtor)(); }
 	
-	BSString			text; 	// 00 - size 10
-	BSString			status;	// 10 - size 10
+	BSString		text; 	// 00 - size 10
+	BSString		status;	// 10 - size 10
 	BSFixedString	sound;	// 20 - size 08
 	tArray<BSFixedString> objectives; // 28 - size 18
 	UInt64			type;	// 40
@@ -991,7 +991,7 @@ class MenuTableItem
 public:
 	BSFixedString	name;				// 000
 	IMenu			* menuInstance;		// 008	0 if the menu is not currently open
-	IMenu *(*menuConstructor)();	// 010
+	IMenu *(*menuConstructor)();		// 010
 
 	bool operator==(const MenuTableItem & rhs) const { return name == rhs.name; }
 	bool operator==(const BSFixedString a_name) const { return name == a_name; }
@@ -1041,6 +1041,7 @@ public:
 	};
 	STATIC_ASSERT(sizeof(Unknown3) == 0x40);
 
+//private:
 	UInt64					unk_000;	// 000
 
 	EventDispatcher<MenuOpenCloseEvent>		menuOpenCloseEventDispatcher;	// 008

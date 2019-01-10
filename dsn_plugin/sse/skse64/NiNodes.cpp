@@ -23,7 +23,7 @@ NiNode * NiNode::Create(UInt32 arrBufLen)
 	void* memory = Heap_Allocate(sizeof(NiNode));
 	memset(memory, 0, sizeof(NiNode));
 	NiNode* xData = (NiNode*)memory;
-	CALL_MEMBER_FN(xData, ctor)(arrBufLen);
+	xData->ctor(arrBufLen);
 	return xData;
 }
 
@@ -32,6 +32,6 @@ BSFadeNode * BSFadeNode::Create()
 	void* memory = Heap_Allocate(sizeof(BSFadeNode));
 	memset(memory, 0, sizeof(BSFadeNode));
 	BSFadeNode* xData = (BSFadeNode*)memory;
-	CALL_MEMBER_FN(xData, ctor)();
+	xData->ctor();
 	return xData;
 }

@@ -9,7 +9,7 @@ BSString::~BSString()
 	}
 }
 
-const char * BSString::Get(void)
+const char * BSString::Get(void) const
 {
 	return m_data ? m_data : "";
 }

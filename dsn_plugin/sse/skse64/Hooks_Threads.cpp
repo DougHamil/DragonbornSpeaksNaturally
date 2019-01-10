@@ -10,20 +10,26 @@
 ICriticalSection			s_taskQueueLock;
 std::queue<TaskDelegate*>	s_tasks;
 
+static bool IsTaskQueueEmpty()
+{
+	IScopedCriticalSection scoped(&s_taskQueueLock);
+	return s_tasks.empty();
+}
+
 void BSTaskPool::ProcessTasks()
 {
 	CALL_MEMBER_FN(this, ProcessTaskQueue_HookTarget)();
 
-	s_taskQueueLock.Enter();
-	while (!s_tasks.empty())
+	while (!IsTaskQueueEmpty())
 	{
+		s_taskQueueLock.Enter();
 		TaskDelegate * cmd = s_tasks.front();
 		s_tasks.pop();
+		s_taskQueueLock.Leave();
 
 		cmd->Run();
 		cmd->Dispose();
 	}
-	s_taskQueueLock.Leave();
 }
 
 void TaskInterface::AddTask(TaskDelegate * cmd)

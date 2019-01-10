@@ -102,6 +102,7 @@ const std::string & GetOSInfoStr()
 
 		info.dwOSVersionInfoSize = sizeof(info);
 
+#pragma warning (disable : 4996)
 		if(GetVersionEx(&info))
 		{
 			char	buf[256];

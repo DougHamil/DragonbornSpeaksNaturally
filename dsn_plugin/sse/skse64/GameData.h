@@ -119,7 +119,9 @@ struct ModInfo		// referred to by game as TESFile
 	UInt32								unk470;				// 470
 	UInt32								unk474;				// 474
 	UInt8								modIndex;			// 478 init to 0xFF
-	UInt8								pad47C[7];
+	UInt8								pad479;				// 479
+	UInt16								lightIndex;			// 47A
+	UInt8								pad47C[4];
 	BSString							author;				// 480
 	BSString							description;		// 490
 	void								* dataBuf;			// 4A0 

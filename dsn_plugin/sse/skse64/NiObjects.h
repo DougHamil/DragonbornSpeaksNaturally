@@ -193,32 +193,32 @@ public:
 	virtual void	Unk_31(UInt32 arg0); // SE: function 34
 	//virtual void	Unk_32(UInt32 arg0);
 
-	NiNode		* m_parent;			// 30
-	UInt32		unk038;				// 38 - New in SE, init'd to FFFFFFFF
-	UInt32		pad03C;				// 3C
-	NiAVObject	* unk040;			// 40
-	NiTransform	m_localTransform;	// 48
-	NiTransform	unkTransform;;		// 7C - SE: this one is new
-	NiTransform	m_worldTransform;	// B0
-	float		unkE4;				// E4
-	float		unkE8;				// E8
-	float		unkEC;				// EC
-	float		unkF0;				// F0
-	UInt32		m_flags;			// F4 - bitfield
-	float		unkF8;				// F8
-	UInt32		unkFC;				// FC
-	float		unk100;				// 100 - New in SE? init's to 1.0
-	UInt32		unk104;				// 104 - New in SE? init'd to 0
-	UInt8		unk108;				// 108
-	UInt8		unk109;				// 109 - bitfield
-	UInt8		pad10A[6];			// 10A
+	NiNode		* m_parent;				// 30
+	UInt32		unk038;					// 38 - New in SE, init'd to FFFFFFFF
+	UInt32		pad03C;					// 3C
+	NiAVObject	* unk040;				// 40
+	NiTransform	m_localTransform;		// 48
+	NiTransform	m_worldTransform;		// 7C
+	NiTransform	m_oldWorldTransform;	// B0 - SE: this one is new
+	float		unkE4;					// E4
+	float		unkE8;					// E8
+	float		unkEC;					// EC
+	float		unkF0;					// F0
+	UInt32		m_flags;				// F4 - bitfield
+	float		unkF8;					// F8
+	UInt32		unkFC;					// FC
+	float		unk100;					// 100 - New in SE? init's to 1.0
+	UInt32		unk104;					// 104 - New in SE? init'd to 0
+	UInt8		unk108;					// 108
+	UInt8		unk109;					// 109 - bitfield
+	UInt8		pad10A[6];				// 10A
 
 	MEMBER_FN_PREFIX(NiAVObject);
 	// 3239A102C6E8818F0FBFEF58A1B6EA724A237258+26
 	DEFINE_MEMBER_FN(UpdateNode, void, 0x00C56890, ControllerUpdateContext * ctx);
 };
 STATIC_ASSERT(offsetof(NiAVObject, m_localTransform) == 0x48);
-STATIC_ASSERT(offsetof(NiAVObject, m_worldTransform) == 0xB0);
+STATIC_ASSERT(offsetof(NiAVObject, m_worldTransform) == 0x7C);
 STATIC_ASSERT(sizeof(NiAVObject) == 0x110);
 
 

@@ -7,7 +7,7 @@
 
 class BSFaceGenAnimationData;
 
-// B8
+// 128
 class NiNode : public NiAVObject
 {
 public:
@@ -21,27 +21,25 @@ public:
 	virtual void	Unk_3A(void);
 	virtual void	UpdateUpwardPass(void);
 
-	NiTArray <NiAVObject *>	m_children;	// A8
+	NiTArray <NiAVObject *>	m_children;	// 110
 
 	static NiNode * Create(UInt32 arrBufLen = 0);
 
-	MEMBER_FN_PREFIX(NiNode);
-	DEFINE_MEMBER_FN(ctor, NiNode*, 0x00000000, UInt32 arrBufLen);
+	DEFINE_MEMBER_FN_1(ctor, NiNode*, 0x00C577A0, UInt16 arrBufLen);
 };
-//STATIC_ASSERT(sizeof(NiNode) == 0xB8);
+STATIC_ASSERT(sizeof(NiNode) == 0x128);
 
-// E4
+// 158
 class BSFadeNode : public NiNode
 {
 public:
-	UInt32	unkB8[(0xE4 - 0xB8) >> 2];
+	UInt32	unkB8[(0x158 - 0x128) >> 2];
 
 	static BSFadeNode * Create();
 
-	MEMBER_FN_PREFIX(BSFadeNode);
-	DEFINE_MEMBER_FN(ctor, BSFadeNode *, 0x00000000);
+	DEFINE_MEMBER_FN_0(ctor, BSFadeNode *, 0x012A6CD0);
 };
-//STATIC_ASSERT(sizeof(BSFadeNode) == 0xE4);
+STATIC_ASSERT(sizeof(BSFadeNode) == 0x158);
 
 // EC
 class BSFaceGenNiNode : public NiNode

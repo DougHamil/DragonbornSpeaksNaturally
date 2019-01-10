@@ -3,11 +3,11 @@
 
 RelocAddr <_LookupFormByID> LookupFormByID(0x00194420);
 
-BGSDefaultObjectManager *	BGSDefaultObjectManager::GetSingleton(void)
+BGSDefaultObjectManager *BGSDefaultObjectManager::GetSingleton(void)
 {
 	// 81542B44FD6902A56B6B1464C37C41C529E9FD2A+31CB
-	static RelocPtr<BGSDefaultObjectManager*> g_BGSDefaultObjectManager(0x01EE4710);
-	return *g_BGSDefaultObjectManager;
+	static RelocPtr<BGSDefaultObjectManager> g_BGSDefaultObjectManager(0x01EE4710);
+	return g_BGSDefaultObjectManager;
 }
 
 void TESForm::CopyFromEx(TESForm * rhsForm)

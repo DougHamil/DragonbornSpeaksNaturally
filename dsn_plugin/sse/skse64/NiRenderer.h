@@ -28,6 +28,8 @@ public:
 	UInt64						unk80;				// 80
 	ID3D11RenderTargetView1		* renderView;		// 88
 	ID3D11ShaderResourceView1	* resourceView;		// 90
+	UInt64						unk2788[(0x2788 - 0x90) >> 3];
+	CRITICAL_SECTION			lock;				// 2790
 
 	// 1412F0390 - CreateRenderTargets
 

@@ -97,7 +97,7 @@ add_library(svr_common        STATIC ${SVR_COMMON_SRC})
 add_library(svr_skse64_common STATIC ${SVR_SKSE64_COMMON_SRC})
 add_library(svr_skse64        STATIC ${SVR_SKSE64_SRC})
 
-target_include_directories(svr_common PUBLIC svr/)
+target_include_directories(svr_common PUBLIC svr/ svr/xbyak/)
 target_compile_options(svr_common PUBLIC /FI"common/IPrefix.h")
 target_compile_definitions(svr_skse64 PRIVATE
     SKSE64_EXPORTS
@@ -108,6 +108,29 @@ target_compile_definitions(svr_skse64 PRIVATE
 
 target_link_libraries(svr_skse64_common svr_common)
 target_link_libraries(svr_skse64 svr_skse64_common)
+
+#
+# SKSE64 for SkyrimSE
+#
+
+file(GLOB SSE_COMMON_SRC        sse/common/*.h        sse/common/*.cpp)
+file(GLOB SSE_SKSE64_COMMON_SRC sse/skse64_common/*.h sse/skse64_common/*.cpp)
+file(GLOB SSE_SKSE64_SRC        sse/skse64/*.h        sse/skse64/*.cpp)
+
+add_library(sse_common        STATIC ${SSE_COMMON_SRC})
+add_library(sse_skse64_common STATIC ${SSE_SKSE64_COMMON_SRC})
+add_library(sse_skse64        STATIC ${SSE_SKSE64_SRC})
+
+target_include_directories(sse_common PUBLIC sse/ sse/xbyak/)
+target_compile_options(sse_common PUBLIC /FI"common/IPrefix.h")
+target_compile_definitions(sse_skse64 PRIVATE
+    SKSE64_EXPORTS
+    RUNTIME
+    RUNTIME_VERSION=0x01030401
+)
+
+target_link_libraries(sse_skse64_common sse_common)
+target_link_libraries(sse_skse64 sse_skse64_common)
 
 #
 # dsn plugin
@@ -121,14 +144,28 @@ file(GLOB_RECURSE DSN_PLUGIN_SRC
     CMakeLists.txt
 )
 
-add_library(dsn_plugin SHARED ${DSN_PLUGIN_SRC})
-target_link_libraries(dsn_plugin svr_skse64 version)
-set_target_safeseh(dsn_plugin)
+# for SkyrimVR
+add_library(dsn_plugin_vr SHARED ${DSN_PLUGIN_SRC})
+target_link_libraries(dsn_plugin_vr svr_skse64 version)
+set_target_safeseh(dsn_plugin_vr)
 
-target_include_directories(dsn_plugin PUBLIC dsn_plugin/)
-set_target_properties(dsn_plugin PROPERTIES
+target_include_directories(dsn_plugin_vr PUBLIC dsn_plugin/)
+set_target_properties(dsn_plugin_vr PROPERTIES
   OUTPUT_NAME "dragonborn_speaks_naturally"
   ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/SkyrimVR"
   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/SkyrimVR"
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/SkyrimVR"
+)
+
+# for SkyrimSE
+add_library(dsn_plugin_se SHARED ${DSN_PLUGIN_SRC})
+target_link_libraries(dsn_plugin_se sse_skse64 version)
+set_target_safeseh(dsn_plugin_se)
+
+target_include_directories(dsn_plugin_se PUBLIC dsn_plugin/)
+set_target_properties(dsn_plugin_se PROPERTIES
+  OUTPUT_NAME "dragonborn_speaks_naturally"
+  ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/SkyrimSE"
+  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/SkyrimSE"
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/SkyrimSE"
 )

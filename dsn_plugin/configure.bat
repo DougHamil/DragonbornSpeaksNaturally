@@ -69,7 +69,7 @@ goto :eof
 
 :save_ini [>ini path]
 set "op="
-set "##=env was set"
+set "##=##"
 for /f "tokens=1-3 delims=#=" %%a in ('set ##') do (
     if "%%a"=="!op!" (
         echo,%%b=%%c

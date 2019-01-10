@@ -55,4 +55,10 @@ name          | description
 [svr/](dsn_plugin/svr) | The [SKSEVR](http://skse.silverlock.org/) codes for linking to `dsn_plugin` to generate a SkyrimVR-compatible DLL.
 [CMakeLists.txt](dsn_plugin/CMakeLists.txt) | A project description file used by the `CMake` build tool.
 [configure.bat](dsn_plugin/configure.bat) | A script to create a Visual Studio project in the `build` directory via `CMake` and load it.
+build/ | After you run `configure.bat`, the directory will be created automatically to hold the `Visual Studio` project and all build outputs. You can delete this directory at any time and re-run `configure.bat` to generate it. Files in this directory should not be commited to the repository.
 
+### About `dsn_plugin_se` and `dsn_plugin_vr` in Visual Studio
+
+They are the same directory and have the same codes. Modifying the code in one place is equivalent to modifying another.
+
+The only difference between the two is that the linked library and header file including paths are different.

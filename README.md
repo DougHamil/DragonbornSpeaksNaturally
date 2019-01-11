@@ -44,8 +44,7 @@ You can delete it and run `configure.bat` again to reset the path, or edit it di
 
 ### How the Auto installation works
 
-The installation will execute when you build the project `INSTALL` or use `Build Solution`.
-Building only `dsn_plugin_xx` cannot trigger the auto installation.
+The installation will be triggered each time you build `dsn_plugin_xx`. You can also trigger it manually via building `INSTALL` project.
 
 ### Directory structure of dsn_plugin
 name          | description

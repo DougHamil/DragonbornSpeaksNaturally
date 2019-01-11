@@ -190,6 +190,12 @@ if (SVR_DIR)
         COMPONENT SkyrimVR
         RUNTIME DESTINATION ${SVR_PLUGIN_DIR}
     )
+    add_custom_command(
+        TARGET dsn_plugin_vr POST_BUILD VERBATIM
+        COMMAND
+            ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:dsn_plugin_vr>" ${SVR_PLUGIN_DIR} &&
+            echo file copied: "$<TARGET_FILE:dsn_plugin_vr> -> ${SVR_PLUGIN_DIR}"
+    )
 endif()
 
 if (SSE_DIR)
@@ -199,5 +205,11 @@ if (SSE_DIR)
     install(TARGETS dsn_plugin_se
         COMPONENT SkyrimSE
         RUNTIME DESTINATION ${SSE_PLUGIN_DIR}
+    )
+    add_custom_command(
+        TARGET dsn_plugin_se POST_BUILD VERBATIM
+        COMMAND
+            ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:dsn_plugin_se>" ${SSE_PLUGIN_DIR} &&
+            echo file copied: "$<TARGET_FILE:dsn_plugin_se> -> ${SSE_PLUGIN_DIR}"
     )
 endif()

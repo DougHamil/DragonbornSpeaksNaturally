@@ -107,7 +107,7 @@ target_compile_options(svr_common PUBLIC /FI"common/IPrefix.h")
 target_compile_definitions(svr_skse64 PRIVATE
     SKSE64_EXPORTS
     RUNTIME
-    RUNTIME_VERSION=0x01030401
+    RUNTIME_VERSION=0x010400F1
     IS_VR
 )
 
@@ -131,7 +131,7 @@ target_compile_options(sse_common PUBLIC /FI"common/IPrefix.h")
 target_compile_definitions(sse_skse64 PRIVATE
     SKSE64_EXPORTS
     RUNTIME
-    RUNTIME_VERSION=0x01030401
+    RUNTIME_VERSION=0x010503E0
 )
 
 target_link_libraries(sse_skse64_common sse_common)
@@ -159,6 +159,9 @@ set_target_properties(dsn_plugin_vr PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/SkyrimVR"
   LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/SkyrimVR"
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/SkyrimVR"
+)
+target_compile_definitions(dsn_plugin_vr PRIVATE
+    IS_VR
 )
 
 # for SkyrimSE

@@ -72,16 +72,7 @@ The only difference between the two is that they linked to different SKSE librar
 
 ## Build [dsn_service](dsn_service) and [dsn_plugin](dsn_plugin) at the same time
 
-You need a [Visual Studio](https://visualstudio.microsoft.com/) with  modules.
-
-Then enter [dsn_service](dsn_service) directory and double-click `dsn_service.sln`, a Visual Studio C# project will be loaded.
-
-
-## Build [dsn_plugin](dsn_plugin) only
-
-You need a [Visual Studio](https://visualstudio.microsoft.com/) (with `C++ Desktop Development` and `.NET Desktop Development` module) and a [CMake](https://cmake.org/).
-
-Then double-click `configure.bat` in the root directory of the repo, a Visual Studio project will be created by Cmake and loaded automatically.
+Double-click `configure.bat` in the root directory of the repo, a Visual Studio project will be created by Cmake and loaded automatically.
 
 ### Generate FOMod/NMM/Vortex Compatible ZIP Package
 

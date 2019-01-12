@@ -90,3 +90,31 @@ You can build the Visual Studio project `PACKAGE` to Generate a ZIP Package for 
 A `fomod` directory will be added to so the ZIP can be installed via [NMM](https://www.nexusmods.com/site/mods/4) and [Vortex](https://www.nexusmods.com/site/mods/1).
 
 The package name will be `build/DSN-0.1.1-win64.zip`.
+
+### Cannot build `dsn_service` because some assemblies missing
+
+```
+3>------ Build started: Project: dsn_service, Configuration: Debug x64 ------
+3>C:\work\DragonbornSpeaksNaturally\dsn_service\dsn_service\CommandList.cs(1,7,1,16): error CS0246: The type or namespace name 'IniParser' could not be found (are you missing a using directive or an assembly reference?)
+3>C:\work\DragonbornSpeaksNaturally\dsn_service\dsn_service\Configuration.cs(64,24,64,31): error CS0246: The type or namespace name 'IniData' could not be found (are you missing a using directive or an assembly reference?)
+...
+```
+
+For technical reasons, CMake can't automatically restore the NuGet package and update references for project dsn_service.
+
+If you met assembly missing, please restore and reinstall NuGet packages manually:
+
+1. open `NuGet Package Manager Console` first:
+   > `Tools` > `NuGet Package Manager` > `Package Manager Console`
+
+2. A prompt box will appear:
+   > Some NuGet packages are missing from this solution. Click to restore from your online package sources.
+   
+   Click the `restore` button.
+
+3. Run this command in your NuGet Package Manager Console:
+   ```powershell
+   Update-Package -reinstall -projectname dsn_service
+   ```
+
+4. Then you can build `dsn_service` normally.

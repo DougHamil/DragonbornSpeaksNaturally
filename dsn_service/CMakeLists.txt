@@ -24,17 +24,12 @@ add_executable(dsn_service ${DSN_SERVICE_SRC})
 # NuGet package restore
 ###############
 
-set(CMAKE_BIN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake/bin")
-find_program(NUGET nuget PATHS ${CMAKE_BIN_DIR})
-if(NOT NUGET)
-    message(FATAL_ERROR "Cannot find nuget command line tool, but it should be here: ${CMAKE_BIN_DIR}/nuget.exe")
-endif()
-add_custom_target(nuget-restore COMMAND
-    ${NUGET} restore ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.sln &&
-    echo ==================================================================================== &&
-    echo If you met assembly missing, run this command in your NuGet Package Manager Console: &&
-    echo Update-Package -reinstall -projectname dsn_service &&
-    echo ====================================================================================
+add_custom_target(Please_Reinstall_NuGet_Packages_Manually COMMAND
+    echo ========================================================================================================================== &&
+    echo For technical reasons, CMake can't automatically restore the NuGet package and update references for project dsn_service.  &&
+    echo If you met assembly missing, please restore NuGet packages manually and run this command in NuGet Package Manager Console: &&
+    echo Update-Package -reinstall -projectname dsn_service                                                                         &&
+    echo ==========================================================================================================================
 )
 
 configure_file(
@@ -49,7 +44,7 @@ configure_file(
     COPYONLY
 )
 
-add_dependencies(dsn_service nuget-restore)
+add_dependencies(dsn_service Please_Reinstall_NuGet_Packages_Manually)
 
 
 ###############
@@ -85,7 +80,8 @@ if (SVR_DIR)
     set(SVR_PLUGIN_DIR "${SVR_DIR}/Data/Plugins/Sumwunn")
     message("-- SkyrimVR plugin install path: ${SVR_PLUGIN_DIR}/")
 
-    install(TARGETS dsn_service
+    install(
+        TARGETS dsn_service
         COMPONENT SkyrimVR
         RUNTIME DESTINATION ${SVR_PLUGIN_DIR}
     )
@@ -101,10 +97,6 @@ if (SSE_DIR)
     set(SSE_PLUGIN_DIR "${SSE_DIR}/Data/Plugins/Sumwunn")
     message("-- SkyrimSE plugin install path: ${SSE_PLUGIN_DIR}/")
 
-    install(TARGETS dsn_service
-        COMPONENT SkyrimSE
-        RUNTIME DESTINATION ${SSE_PLUGIN_DIR}
-    )
     add_custom_command(
         TARGET dsn_service POST_BUILD VERBATIM
         COMMAND
@@ -112,3 +104,34 @@ if (SSE_DIR)
             echo file copied: "$<TARGET_FILE:dsn_service> -> ${SSE_PLUGIN_DIR}"
     )
 endif()
+
+#
+# ZIP Package 
+#
+option(PACKAGE "Generate NMM/Vortex Compatible ZIP Package" ON)
+if (PACKAGE)
+    if (NOT IS_SUB_PROJECT)
+        message("-- Generate NMM/Vortex Compatible ZIP Package: On (-DPACKAGE=ON)")
+    endif()
+
+    set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/package_tmp)
+    install(
+        TARGETS dsn_service
+        RUNTIME DESTINATION SkyrimVR/Data/Plugins/Sumwunn
+    )
+    install(
+        TARGETS dsn_service
+        RUNTIME DESTINATION SkyrimSE/Data/Plugins/Sumwunn
+    )
+
+    set(CPACK_GENERATOR ZIP)
+    set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
+    if (NOT IS_SUB_PROJECT)
+        include(CPack)
+    endif()
+else()
+    if (NOT IS_SUB_PROJECT)
+        message("-- Generate NMM/Vortex Compatible ZIP Package: Off (-DPACKAGE=OFF)")
+    endif()
+endif()
+

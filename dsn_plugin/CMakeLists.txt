@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(dsn_plugin)
+project(dsn_plugin LANGUAGES CXX)
 
 
 ###############
@@ -186,10 +186,6 @@ if (SVR_DIR)
     set(SVR_PLUGIN_DIR "${SVR_DIR}/Data/Plugins/Sumwunn")
     message("-- SkyrimVR plugin install path: ${SVR_PLUGIN_DIR}/")
 
-    install(TARGETS dsn_plugin_vr
-        COMPONENT SkyrimVR
-        RUNTIME DESTINATION ${SVR_PLUGIN_DIR}
-    )
     add_custom_command(
         TARGET dsn_plugin_vr POST_BUILD VERBATIM
         COMMAND
@@ -202,14 +198,40 @@ if (SSE_DIR)
     set(SSE_PLUGIN_DIR "${SSE_DIR}/Data/Plugins/Sumwunn")
     message("-- SkyrimSE plugin install path: ${SSE_PLUGIN_DIR}/")
 
-    install(TARGETS dsn_plugin_se
-        COMPONENT SkyrimSE
-        RUNTIME DESTINATION ${SSE_PLUGIN_DIR}
-    )
     add_custom_command(
         TARGET dsn_plugin_se POST_BUILD VERBATIM
         COMMAND
             ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:dsn_plugin_se>" ${SSE_PLUGIN_DIR} &&
             echo file copied: "$<TARGET_FILE:dsn_plugin_se> -> ${SSE_PLUGIN_DIR}"
     )
+endif()
+
+#
+# ZIP Package 
+#
+option(PACKAGE "Generate NMM/Vortex Compatible ZIP Package" ON)
+if (PACKAGE)
+    if (NOT IS_SUB_PROJECT)
+        message("-- Generate NMM/Vortex Compatible ZIP Package: On (-DPACKAGE=ON)")
+    endif()
+
+    set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/package_tmp)
+    install(
+        TARGETS dsn_plugin_vr
+        RUNTIME DESTINATION SkyrimVR/Data/Plugins/Sumwunn
+    )
+    install(
+        TARGETS dsn_plugin_se
+        RUNTIME DESTINATION SkyrimSE/Data/Plugins/Sumwunn
+    )
+
+    set(CPACK_GENERATOR ZIP)
+    set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
+    if (NOT IS_SUB_PROJECT)
+        include(CPack)
+    endif()
+else()
+    if (NOT IS_SUB_PROJECT)
+        message("-- Generate NMM/Vortex Compatible ZIP Package: Off (-DPACKAGE=OFF)")
+    endif()
 endif()

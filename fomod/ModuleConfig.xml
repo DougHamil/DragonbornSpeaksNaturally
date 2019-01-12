@@ -1,0 +1,25 @@
+<!-- Created with FOMOD Creation Tool 1.7.0.37 [http://www.nexusmods.com/fallout4/mods/6821] -->
+<!-- FOMod Document [https://media.readthedocs.org/pdf/fomod-docs/latest/fomod-docs.pdf] -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
+	<moduleName>Dragonborn Speaks Naturally</moduleName>
+	<conditionalFileInstalls>
+		<patterns>
+			<pattern>
+				<dependencies operator="And">
+					<fileDependency file="SkyrimVR.esm" state="Active"/>
+				</dependencies>
+				<files>
+					<folder source="SkyrimVR\Data\Plugins" destination="Plugins" priority="0" />
+				</files>
+			</pattern>
+			<pattern>
+				<dependencies operator="And">
+					<fileDependency file="SkyrimVR.esm" state="Missing"/>
+				</dependencies>
+				<files>
+					<folder source="SkyrimSE\Data\Plugins" destination="Plugins" priority="0" />
+				</files>
+			</pattern>
+		</patterns>
+	</conditionalFileInstalls>
+</config>

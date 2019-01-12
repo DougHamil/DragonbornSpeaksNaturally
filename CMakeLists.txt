@@ -32,6 +32,18 @@ if (PACKAGE)
         DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/fomod
         DESTINATION .
     )
+    install(
+        FILES
+            ${CMAKE_CURRENT_SOURCE_DIR}/DragonbornSpeaksNaturally.SAMPLE.ini
+            ${CMAKE_CURRENT_SOURCE_DIR}/item-name-map.SAMPLE.json
+        DESTINATION SkyrimVR/Data/Plugins/Sumwunn
+    )
+    install(
+        FILES
+            ${CMAKE_CURRENT_SOURCE_DIR}/DragonbornSpeaksNaturally.SAMPLE.ini
+            ${CMAKE_CURRENT_SOURCE_DIR}/item-name-map.SAMPLE.json
+        DESTINATION SkyrimSE/Data/Plugins/Sumwunn
+    )
 
     set(CPACK_GENERATOR ZIP)
     set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)

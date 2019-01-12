@@ -110,7 +110,7 @@ If you met assembly missing, please restore and reinstall NuGet packages manuall
 2. A prompt box will appear:
    > Some NuGet packages are missing from this solution. Click to restore from your online package sources.
    
-   Click the `restore` button.
+   Click the `restore` button. If you can't find it, just skip this step. The restore may be finished automatically.
 
 3. Run this command in your NuGet Package Manager Console:
    ```powershell

@@ -16,6 +16,7 @@ namespace DSN {
             System.IO.Directory.CreateDirectory(logFilePath);
             logFilePath += "\\"+ERROR_LOG_FILE;
             try {
+                // The compiler constant TRACE needs to be defined, otherwise logs will not be output to the file.
                 var listener = new TextWriterTraceListener(logFilePath);
                 listener.TraceOutputOptions = TraceOptions.DateTime;
                 Trace.AutoFlush = true;

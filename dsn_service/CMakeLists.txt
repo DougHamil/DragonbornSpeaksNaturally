@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.5)
 project(dsn_service LANGUAGES CSharp)
 
 include(CSharpUtilities)
-set(CMAKE_CSharp_FLAGS "/langversion:6 /platform:anycpu")
+set(CMAKE_CSharp_FLAGS "/langversion:6 /platform:anycpu /define:TRACE")
 
 
 ###############

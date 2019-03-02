@@ -35,6 +35,9 @@ if defined SkyrimSEInstallPath (
 )
 echo CMakeFlags:!CMakeFlags!
 
+:: disable Prefer32Bit for C# project
+SET Prefer32Bit=false
+
 cmake -A x64 !CMakeFlags! ..
 
 :: load project

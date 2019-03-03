@@ -12,7 +12,6 @@ namespace DSN {
 
     class Configuration {
         private readonly string CONFIG_FILE_NAME = "DragonbornSpeaksNaturally.ini";
-        private readonly string COMMAND_FILE_NAME = "DragonbornSpeaksNaturally.ini";
 
         // NOTE: Relative to SkyrimVR.exe
         private readonly string[] SEARCH_DIRECTORIES = {
@@ -23,6 +22,7 @@ namespace DSN {
         private IniData global = null;
         private IniData local = null;
         private IniData merged = null;
+        private List<string> goodbyePhrases = null;
         private CommandList consoleCommandList = null;
 
         public Configuration() { }
@@ -35,28 +35,26 @@ namespace DSN {
         }
 
         public List<string> GetGoodbyePhrases() {
-            string phrases = merged["Dialogue"]["goodbyePhrases"];
-            if(phrases != null) {
-                List<string> list = new List<string>(phrases.Split(';'));
-                list.RemoveAll((str) => str == null || str.Trim() == "");
-                return list;
+            if (goodbyePhrases == null) {
+                goodbyePhrases = new List<string>();
+
+                string phrases = getData()["Dialogue"]["goodbyePhrases"];
+                if (phrases != null) {
+                    goodbyePhrases.AddRange(phrases.Split(';'));
+                    goodbyePhrases.RemoveAll((str) => str == null || str.Trim() == "");
+                }
             }
-            return new List<string>();
+
+            return goodbyePhrases;
         }
 
         public CommandList GetConsoleCommandList() {
-            if(consoleCommandList != null)
-                return consoleCommandList;
+            if (consoleCommandList == null) {
+                consoleCommandList = CommandList.FromIniSection(getData(), "ConsoleCommands");
 
-            IniData commandData = loadIniFromFilename(COMMAND_FILE_NAME);
-            if(commandData != null) {
-                consoleCommandList = CommandList.FromIniSection(commandData, "ConsoleCommands");
-            } else {
-                consoleCommandList = new CommandList();
+                Trace.TraceInformation("Loaded Console Commands:");
+                consoleCommandList.PrintToTrace();
             }
-
-            Trace.TraceInformation("Loaded Console Commands:");
-            consoleCommandList.PrintToTrace();
 
             return consoleCommandList;
         }
@@ -79,7 +77,6 @@ namespace DSN {
         }
 
         private void loadLocal() {
-
             local = loadIniFromFilename(CONFIG_FILE_NAME);
             if (local == null)
                 local = new IniData();

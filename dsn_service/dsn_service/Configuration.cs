@@ -11,30 +11,30 @@ using System.Threading.Tasks;
 namespace DSN {
 
     class Configuration {
-        private static readonly string CONFIG_FILE_NAME = "DragonbornSpeaksNaturally.ini";
-        private static readonly string COMMAND_FILE_NAME = "DragonbornSpeaksNaturally.ini";
+        private readonly string CONFIG_FILE_NAME = "DragonbornSpeaksNaturally.ini";
+        private readonly string COMMAND_FILE_NAME = "DragonbornSpeaksNaturally.ini";
 
         // NOTE: Relative to SkyrimVR.exe
-        private static readonly string[] SEARCH_DIRECTORIES = {
+        private readonly string[] SEARCH_DIRECTORIES = {
             "Data\\Plugins\\Sumwunn\\",
             ""
         };
 
-        private static IniData global = null;
-        private static IniData local = null;
-        private static IniData merged = null;
-        private static CommandList consoleCommandList = null;
+        private IniData global = null;
+        private IniData local = null;
+        private IniData merged = null;
+        private CommandList consoleCommandList = null;
 
-        private Configuration() { }
+        public Configuration() { }
 
-        public static string Get(string section, string key, string def) {
+        public string Get(string section, string key, string def) {
             string val = getData()[section][key];
             if (val == null)
                 return def;
             return val;
         }
 
-        public static List<string> GetGoodbyePhrases() {
+        public List<string> GetGoodbyePhrases() {
             string phrases = merged["Dialogue"]["goodbyePhrases"];
             if(phrases != null) {
                 List<string> list = new List<string>(phrases.Split(';'));
@@ -44,7 +44,7 @@ namespace DSN {
             return new List<string>();
         }
 
-        public static CommandList GetConsoleCommandList() {
+        public CommandList GetConsoleCommandList() {
             if(consoleCommandList != null)
                 return consoleCommandList;
 
@@ -61,7 +61,7 @@ namespace DSN {
             return consoleCommandList;
         }
 
-        private static IniData getData() {
+        private IniData getData() {
             if (merged == null) {
                 loadLocal();
                 loadGlobal();
@@ -73,19 +73,19 @@ namespace DSN {
             return merged;
         }
 
-        private static void loadGlobal() {
+        private void loadGlobal() {
             global = new IniData();
             // global["SpeechRecognition"]["Locale"] = "en-US";
         }
 
-        private static void loadLocal() {
+        private void loadLocal() {
 
             local = loadIniFromFilename(CONFIG_FILE_NAME);
             if (local == null)
                 local = new IniData();
         }
 
-        public static string resolveFilePath(string filename) {
+        public string resolveFilePath(string filename) {
             foreach (string directory in SEARCH_DIRECTORIES) {
                 string filepath = directory + filename;
                 if (File.Exists(filepath)) {
@@ -95,7 +95,7 @@ namespace DSN {
             return null;
         }
 
-        private static IniData loadIniFromFilename(string filename) {
+        private IniData loadIniFromFilename(string filename) {
             string filepath = resolveFilePath(filename);
             if (filepath != null) {
                 Trace.TraceInformation("Loading ini from path " + filepath);

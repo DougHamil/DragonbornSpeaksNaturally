@@ -24,11 +24,14 @@ namespace DSN {
         private ISpeechRecognitionGrammarProvider[] grammarProviders;
 
         private Thread waitingDeviceThread;
+        private Configuration config;
 
-        public SpeechRecognitionManager() {
-            string locale = Configuration.Get("SpeechRecognition", "Locale", CultureInfo.InstalledUICulture.Name);
-            dialogueMinimumConfidence = float.Parse(Configuration.Get("SpeechRecognition", "dialogueMinConfidence", "0.5"), CultureInfo.InvariantCulture);
-            commandMinimumConfidence = float.Parse(Configuration.Get("SpeechRecognition", "commandMinConfidence", "0.7"), CultureInfo.InvariantCulture);
+        public SpeechRecognitionManager(Configuration config) {
+            this.config = config;
+
+            string locale = config.Get("SpeechRecognition", "Locale", CultureInfo.InstalledUICulture.Name);
+            dialogueMinimumConfidence = float.Parse(config.Get("SpeechRecognition", "dialogueMinConfidence", "0.5"), CultureInfo.InvariantCulture);
+            commandMinimumConfidence = float.Parse(config.Get("SpeechRecognition", "commandMinConfidence", "0.7"), CultureInfo.InvariantCulture);
 
             Trace.TraceInformation("Locale: {0}\nDialogueConfidence: {1}\nCommandConfidence: {2}", locale, dialogueMinimumConfidence, commandMinimumConfidence);
 
@@ -91,7 +94,7 @@ namespace DSN {
         }
 
         private void DSN_AudioStateChanged(object sender, AudioStateChangedEventArgs e) {
-            if (Configuration.Get("SpeechRecognition", "bLogAudioSignalIssues", "0") == "1") {
+            if (config.Get("SpeechRecognition", "bLogAudioSignalIssues", "0") == "1") {
                 Trace.TraceInformation("Audio state changed: {0}", e.AudioState.ToString());
             }
 
@@ -103,7 +106,7 @@ namespace DSN {
         }
 
         private void DSN_AudioSignalProblemOccurred(object sender, AudioSignalProblemOccurredEventArgs e) {
-            if(Configuration.Get("SpeechRecognition", "bLogAudioSignalIssues", "0") == "1") {
+            if(config.Get("SpeechRecognition", "bLogAudioSignalIssues", "0") == "1") {
                 Trace.TraceInformation("Audio signal problem occurred during speech recognition: {0}", e.AudioSignalProblem.ToString());
             }
         }

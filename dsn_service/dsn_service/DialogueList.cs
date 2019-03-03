@@ -9,24 +9,29 @@ namespace DSN {
 
         private static readonly SubsetMatchingMode DEFAULT_GRAMMAR_MATCHING_MODE = SubsetMatchingMode.OrderedSubsetContentRequired;
 
-        public static DialogueList Parse(string input) {
+        Configuration config;
+
+        public static DialogueList Parse(string input, Configuration config) {
             string[] tokens = input.Split('|');
             long id = long.Parse(tokens[0]);
             List<string> lines = new List<string>();
             for(int i = 1; i < tokens.Length; i++) {
                 lines.Add(Phrases.normalize(tokens[i]));
             }
-            return new DialogueList(id, lines, Configuration.GetGoodbyePhrases());
+            return new DialogueList(id, lines, config);
         }
 
         public long id { get; private set; }
         private Dictionary<Grammar, int> grammarToIndex = new Dictionary<Grammar, int>();
 
-        private DialogueList(long id, List<string> lines, List<string> goodbyePhrases) {
+        private DialogueList(long id, List<string> lines, Configuration config) {
             this.id = id;
-            SubsetMatchingMode matchingMode = getConfiguredMatchingMode();
+            this.config = config;
 
-            for(int i = 0; i < lines.Count; i++) {
+            SubsetMatchingMode matchingMode = getConfiguredMatchingMode();
+            List<string> goodbyePhrases = config.GetGoodbyePhrases();
+
+            for (int i = 0; i < lines.Count; i++) {
                 string line = lines[i];
                 if (line == null || line.Trim() == "")
                     continue;
@@ -71,7 +76,7 @@ namespace DSN {
         }
         private SubsetMatchingMode getConfiguredMatchingMode() {
 
-            string matchingMode = Configuration.Get("SpeechRecognition", "SubsetMatchingMode", Enum.GetName(typeof(SubsetMatchingMode), DEFAULT_GRAMMAR_MATCHING_MODE));
+            string matchingMode = config.Get("SpeechRecognition", "SubsetMatchingMode", Enum.GetName(typeof(SubsetMatchingMode), DEFAULT_GRAMMAR_MATCHING_MODE));
 
             try {
                 return (SubsetMatchingMode)Enum.Parse(typeof(SubsetMatchingMode), matchingMode, true);

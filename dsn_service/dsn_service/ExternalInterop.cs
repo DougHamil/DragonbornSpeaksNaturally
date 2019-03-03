@@ -10,24 +10,30 @@ using System.Threading.Tasks;
 namespace DSN {
     class ExternalInterop {
 
-        private static readonly HashSet<string> BATCH_FILENAMES = new HashSet<string>() { "wotv", "ivrqs" };
-        private static readonly long FILE_CHANGE_DEBOUNCE_TIME_TICKS = 10000 * 200; // 200 ms
+        SkyrimInterop skyrimInterop;
 
-        private static FileSystemWatcher watcher;
-        private static DateTime lastChangeDt = DateTime.Now;
+        private readonly HashSet<string> BATCH_FILENAMES = new HashSet<string>() { "wotv", "ivrqs" };
+        private readonly long FILE_CHANGE_DEBOUNCE_TIME_TICKS = 10000 * 200; // 200 ms
+
+        private FileSystemWatcher watcher;
+        private DateTime lastChangeDt = DateTime.Now;
 
 
-        public static Thread Start() {
+        public ExternalInterop(SkyrimInterop skyrimInterop) {
+            this.skyrimInterop = skyrimInterop;
+        }
+
+        public Thread Start() {
             Thread thread = new Thread(ListenForInput);
             thread.Start();
             return thread;
         }
 
-        public static void Stop() {
+        public void Stop() {
             watcher.EnableRaisingEvents = false;
         }
 
-        private static void ListenForInput() {
+        private void ListenForInput() {
             try {
                 string exepath = System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
                 Trace.TraceInformation(exepath);
@@ -44,14 +50,14 @@ namespace DSN {
             }
         }
 
-        private static void Watcher_Changed(object sender, FileSystemEventArgs e) {
+        private void Watcher_Changed(object sender, FileSystemEventArgs e) {
             if(e.ChangeType == WatcherChangeTypes.Changed || e.ChangeType == WatcherChangeTypes.Created) {
                 string filename = e.Name.ToLower();
                 foreach(string watchedFilename in BATCH_FILENAMES) {
                     if (filename.Equals(watchedFilename)) {
                         DateTime now = DateTime.Now;
                         if (now.Ticks - lastChangeDt.Ticks >= FILE_CHANGE_DEBOUNCE_TIME_TICKS) {
-                            SkyrimInterop.SubmitCommand("COMMAND|bat " + watchedFilename);
+                            skyrimInterop.SubmitCommand("COMMAND|bat " + watchedFilename);
                         }
                         lastChangeDt = now;
                     }

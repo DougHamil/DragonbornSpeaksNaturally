@@ -11,11 +11,22 @@ using System.IO;
 namespace DSN {
     class FavoritesList : ISpeechRecognitionGrammarProvider {
 
-        private  Dictionary<Grammar, string> commandsByGrammar = new Dictionary<Grammar, string>();
-        private string leftHandSuffix = Configuration.Get("Favorites", "equipLeftSuffix", "left");
-        private string rightHandSuffix = Configuration.Get("Favorites", "equipRightSuffix", "right");
-        private string bothHandsSuffix = Configuration.Get("Favorites", "equipBothSuffix", "both");
-        private string mainHand = Configuration.Get("Favorites", "mainHand", "none");
+        Configuration config;
+        private Dictionary<Grammar, string> commandsByGrammar;
+        private string leftHandSuffix;
+        private string rightHandSuffix;
+        private string bothHandsSuffix;
+        private string mainHand;
+
+        public FavoritesList(Configuration config) {
+            this.config = config;
+
+            commandsByGrammar = new Dictionary<Grammar, string>();
+            leftHandSuffix = config.Get("Favorites", "equipLeftSuffix", "left");
+            rightHandSuffix = config.Get("Favorites", "equipRightSuffix", "right");
+            bothHandsSuffix = config.Get("Favorites", "equipBothSuffix", "both");
+            mainHand = config.Get("Favorites", "mainHand", "none");
+        }
 
         private HashSet<string> knownEquipmentTypes = new HashSet<string>
         {
@@ -58,7 +69,7 @@ namespace DSN {
         // Returns dynamic map/dictionary or null when the replacement map files cannot be located
         public dynamic LoadItemNameMap()
         {
-            string filepath = Configuration.resolveFilePath("item-name-map.json");
+            string filepath = config.resolveFilePath("item-name-map.json");
             if(File.Exists(filepath))
             {
                 return LoadItemNameMap(filepath);
@@ -92,7 +103,7 @@ namespace DSN {
  
 
         public void Update(string input) {
-            if(Configuration.Get("Favorites", "enabled", "1") == "0") {
+            if(config.Get("Favorites", "enabled", "1") == "0") {
                 return;
             }
 
@@ -102,7 +113,7 @@ namespace DSN {
 
             Trace.TraceInformation("Received favorites list: {0}", input);
 
-            string equipPrefix = Configuration.Get("Favorites", "equipPhrasePrefix", "equip");
+            string equipPrefix = config.Get("Favorites", "equipPhrasePrefix", "equip");
             commandsByGrammar.Clear();
             string[] itemTokens = input.Split('|');
             foreach(string itemStr in itemTokens) {

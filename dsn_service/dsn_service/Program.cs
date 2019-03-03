@@ -27,15 +27,19 @@ namespace DSN {
                     }
                 }
 
-                Thread skyrimThread = SkyrimInterop.Start();
-                Thread externalThread = ExternalInterop.Start();
+                Configuration config = new Configuration();
+                SkyrimInterop skyrimInterop = new SkyrimInterop(config);
+                ExternalInterop externalInterop = new ExternalInterop(skyrimInterop);
+
+                Thread skyrimThread = skyrimInterop.Start();
+                Thread externalThread = externalInterop.Start();
 
                 // Skyrim thread will finish when Skyrim closes
                 skyrimThread.Join();
 
                 // Cleanup threads
-                SkyrimInterop.Stop();
-                ExternalInterop.Stop();
+                skyrimInterop.Stop();
+                externalInterop.Stop();
                 externalThread.Abort();
 
             } catch (Exception ex) {

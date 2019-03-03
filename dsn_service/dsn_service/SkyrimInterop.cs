@@ -11,22 +11,27 @@ using System.Threading.Tasks;
 namespace DSN {
     class SkyrimInterop {
 
-        private static System.Object dialogueLock = new System.Object();
-        private static DialogueList currentDialogue = null;
-        private static FavoritesList favoritesList = null;
-        private static SpeechRecognitionManager recognizer;
-        private static Thread submissionThread;
-        private static BlockingCollection<string> commandQueue;
+        private Configuration config;
+        private System.Object dialogueLock = new System.Object();
+        private DialogueList currentDialogue = null;
+        private FavoritesList favoritesList = null;
+        private SpeechRecognitionManager recognizer;
+        private Thread submissionThread;
+        private BlockingCollection<string> commandQueue;
 
-        public static Thread Start() {
+        public SkyrimInterop(Configuration config) {
+            this.config = config;
+        }
+
+        public Thread Start() {
             try {
-                favoritesList = new FavoritesList();
+                favoritesList = new FavoritesList(config);
                 commandQueue = new BlockingCollection<string>();
-                recognizer = new SpeechRecognitionManager();
+                recognizer = new SpeechRecognitionManager(config);
                 recognizer.OnDialogueLineRecognized += Recognizer_OnDialogueLineRecognized;
 
                 // Start in command-mode
-                recognizer.StartSpeechRecognition(false, Configuration.GetConsoleCommandList(), favoritesList);
+                recognizer.StartSpeechRecognition(false, config.GetConsoleCommandList(), favoritesList);
 
                 Thread listenThread = new Thread(ListenForInput);
                 submissionThread = new Thread(SubmitCommands);
@@ -42,12 +47,12 @@ namespace DSN {
             return null;
         }
 
-        public static void Stop() {
+        public void Stop() {
             submissionThread.Abort();
             recognizer.Stop();
         }
 
-        public static void SubmitCommand(string command) {
+        public void SubmitCommand(string command) {
             commandQueue.Add(sanitize(command));
         }
 
@@ -56,7 +61,7 @@ namespace DSN {
             return command.Replace("\r", "");
         }
 
-        private static void SubmitCommands() {
+        private void SubmitCommands() {
             while(true) {
                 string command = commandQueue.Take();
                 Trace.TraceInformation("Sending command: {0}", command);
@@ -64,7 +69,7 @@ namespace DSN {
             }
         }
 
-        private static void ListenForInput() {
+        private void ListenForInput() {
             try {
                 while (true) {
                     string input = Console.ReadLine();
@@ -81,20 +86,20 @@ namespace DSN {
                     string command = tokens[0];
                     if (command.Equals("START_DIALOGUE")) {
                         lock (dialogueLock) {
-                            currentDialogue = DialogueList.Parse(string.Join("|", tokens, 1, tokens.Length - 1));
+                            currentDialogue = DialogueList.Parse(string.Join("|", tokens, 1, tokens.Length - 1), config);
                         }
                         // Switch to dialogue mode
                         recognizer.StartSpeechRecognition(true, currentDialogue);
                     } else if (command.Equals("STOP_DIALOGUE")) {
                         // Switch to command mode
-                        recognizer.StartSpeechRecognition(false, Configuration.GetConsoleCommandList(), favoritesList);
+                        recognizer.StartSpeechRecognition(false, config.GetConsoleCommandList(), favoritesList);
                         lock (dialogueLock) {
                             currentDialogue = null;
                         }
                     } else if (command.Equals("FAVORITES")) {
                         favoritesList.Update(string.Join("|", tokens, 1, tokens.Length - 1));
                         if(currentDialogue == null) {
-                            recognizer.StartSpeechRecognition(false, Configuration.GetConsoleCommandList(), favoritesList);
+                            recognizer.StartSpeechRecognition(false, config.GetConsoleCommandList(), favoritesList);
                         }
                     }
                 }
@@ -103,7 +108,7 @@ namespace DSN {
             }
         }
 
-        private static void Recognizer_OnDialogueLineRecognized(RecognitionResult result) {
+        private void Recognizer_OnDialogueLineRecognized(RecognitionResult result) {
             string line = result.Text;
 
             lock (dialogueLock) {
@@ -116,7 +121,7 @@ namespace DSN {
                     if(command != null) {
                         SubmitCommand("EQUIP|" + command);
                     } else {
-                        command = Configuration.GetConsoleCommandList().GetCommandForPhrase(result.Grammar);
+                        command = config.GetConsoleCommandList().GetCommandForPhrase(result.Grammar);
                         if (command != null) {
                             SubmitCommand("COMMAND|" + command);
                         }

@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandList.cs" />
+    <Compile Include="ConsoleInput.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="ExternalInterop.cs" />
     <Compile Include="FavoritesList.cs" />

@@ -27,20 +27,34 @@ namespace DSN {
                     }
                 }
 
-                Configuration config = new Configuration();
-                SkyrimInterop skyrimInterop = new SkyrimInterop(config);
-                ExternalInterop externalInterop = new ExternalInterop(skyrimInterop);
+                // Thread.Abort() cannot abort the calling of Console.ReadLine().
+                // So the call is in a separate thread that does not need to be restarted
+                // after reloading the configuration file.
+                ConsoleInput consoleInput = new ConsoleInput();
+                consoleInput.Start();
 
-                Thread skyrimThread = skyrimInterop.Start();
-                Thread externalThread = externalInterop.Start();
+                bool reloadConfigFile = true;
+                while (reloadConfigFile)
+                {
+                    Configuration config = new Configuration();
+                    SkyrimInterop skyrimInterop = new SkyrimInterop(config, consoleInput);
+                    ExternalInterop externalInterop = new ExternalInterop(config, skyrimInterop);
 
-                // Skyrim thread will finish when Skyrim closes
-                skyrimThread.Join();
+                    skyrimInterop.Start();
+                    externalInterop.Start();
 
-                // Cleanup threads
-                skyrimInterop.Stop();
-                externalInterop.Stop();
-                externalThread.Abort();
+                    // skyrimThread will terminate when Skyrim terminated (stdin closed) or config file updated
+                    skyrimInterop.Join();
+
+                    reloadConfigFile = externalInterop.IsConfigFileChanged();
+
+                    if (!reloadConfigFile)
+                    {
+                        // Cleanup threads
+                        externalInterop.Stop();
+                        skyrimInterop.Stop();
+                    }
+                }
 
             } catch (Exception ex) {
                 Trace.TraceError(ex.ToString());

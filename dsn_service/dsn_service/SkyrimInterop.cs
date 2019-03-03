@@ -11,19 +11,23 @@ using System.Threading.Tasks;
 namespace DSN {
     class SkyrimInterop {
 
-        private Configuration config;
+        private Configuration config = null;
+        private ConsoleInput consoleInput = null;
+
         private System.Object dialogueLock = new System.Object();
         private DialogueList currentDialogue = null;
         private FavoritesList favoritesList = null;
         private SpeechRecognitionManager recognizer;
         private Thread submissionThread;
+        private Thread listenThread;
         private BlockingCollection<string> commandQueue;
 
-        public SkyrimInterop(Configuration config) {
+        public SkyrimInterop(Configuration config, ConsoleInput consoleInput) {
             this.config = config;
+            this.consoleInput = consoleInput;
         }
 
-        public Thread Start() {
+        public void Start() {
             try {
                 favoritesList = new FavoritesList(config);
                 commandQueue = new BlockingCollection<string>();
@@ -33,22 +37,26 @@ namespace DSN {
                 // Start in command-mode
                 recognizer.StartSpeechRecognition(false, config.GetConsoleCommandList(), favoritesList);
 
-                Thread listenThread = new Thread(ListenForInput);
+                listenThread = new Thread(ListenForInput);
                 submissionThread = new Thread(SubmitCommands);
                 submissionThread.Start();
                 listenThread.Start();
-                return listenThread;
             }
             catch (Exception ex) {
                 Trace.TraceError("Failed to initialize speech recognition due to error:");
                 Trace.TraceError(ex.ToString());
             }
+        }
 
-            return null;
+        public void Join() {
+            listenThread.Join();
         }
 
         public void Stop() {
-            submissionThread.Abort();
+            // Notify threads to exit
+            consoleInput.WriteLine(null);
+            commandQueue.Add(null);
+            
             recognizer.Stop();
         }
 
@@ -64,6 +72,12 @@ namespace DSN {
         private void SubmitCommands() {
             while(true) {
                 string command = commandQueue.Take();
+
+                // Thread exit signal
+                if (command == null) {
+                    break;
+                }
+
                 Trace.TraceInformation("Sending command: {0}", command);
                 Console.Write(command+"\n");
             }
@@ -72,11 +86,10 @@ namespace DSN {
         private void ListenForInput() {
             try {
                 while (true) {
-                    string input = Console.ReadLine();
+                    string input = consoleInput.ReadLine();
 
-                    // input will be null when Skyrim is terminated
+                    // input will be null when Skyrim terminated (stdin closed)
                     if (input == null) {
-                        Trace.TraceInformation("Skyrim is terminated, recognition service will quit.");
                         break;
                     }
 

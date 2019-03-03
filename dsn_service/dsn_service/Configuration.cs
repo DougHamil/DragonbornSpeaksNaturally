@@ -19,16 +19,31 @@ namespace DSN {
             ""
         };
 
+        private string iniFilePath = null;
+
         private IniData global = null;
         private IniData local = null;
         private IniData merged = null;
         private List<string> goodbyePhrases = null;
         private CommandList consoleCommandList = null;
 
-        public Configuration() { }
+        public Configuration() {
+            iniFilePath = resolveFilePath(CONFIG_FILE_NAME);
+
+            loadLocal();
+            loadGlobal();
+
+            merged = new IniData();
+            merged.Merge(global);
+            merged.Merge(local);
+        }
+
+        public string GetIniFilePath() {
+            return iniFilePath;
+        }
 
         public string Get(string section, string key, string def) {
-            string val = getData()[section][key];
+            string val = merged[section][key];
             if (val == null)
                 return def;
             return val;
@@ -38,7 +53,7 @@ namespace DSN {
             if (goodbyePhrases == null) {
                 goodbyePhrases = new List<string>();
 
-                string phrases = getData()["Dialogue"]["goodbyePhrases"];
+                string phrases = merged["Dialogue"]["goodbyePhrases"];
                 if (phrases != null) {
                     goodbyePhrases.AddRange(phrases.Split(';'));
                     goodbyePhrases.RemoveAll((str) => str == null || str.Trim() == "");
@@ -50,7 +65,7 @@ namespace DSN {
 
         public CommandList GetConsoleCommandList() {
             if (consoleCommandList == null) {
-                consoleCommandList = CommandList.FromIniSection(getData(), "ConsoleCommands");
+                consoleCommandList = CommandList.FromIniSection(merged, "ConsoleCommands");
 
                 Trace.TraceInformation("Loaded Console Commands:");
                 consoleCommandList.PrintToTrace();
@@ -59,25 +74,13 @@ namespace DSN {
             return consoleCommandList;
         }
 
-        private IniData getData() {
-            if (merged == null) {
-                loadLocal();
-                loadGlobal();
-                merged = new IniData();
-                merged.Merge(global);
-                merged.Merge(local);
-            }
-
-            return merged;
-        }
-
         private void loadGlobal() {
             global = new IniData();
             // global["SpeechRecognition"]["Locale"] = "en-US";
         }
 
         private void loadLocal() {
-            local = loadIniFromFilename(CONFIG_FILE_NAME);
+            local = loadIniFromFilePath(iniFilePath);
             if (local == null)
                 local = new IniData();
         }
@@ -86,14 +89,13 @@ namespace DSN {
             foreach (string directory in SEARCH_DIRECTORIES) {
                 string filepath = directory + filename;
                 if (File.Exists(filepath)) {
-                    return filepath;
+                    return Path.GetFullPath(filepath); ;
                 }
             }
             return null;
         }
 
-        private IniData loadIniFromFilename(string filename) {
-            string filepath = resolveFilePath(filename);
+        private IniData loadIniFromFilePath(string filepath) {
             if (filepath != null) {
                 Trace.TraceInformation("Loading ini from path " + filepath);
                 try {

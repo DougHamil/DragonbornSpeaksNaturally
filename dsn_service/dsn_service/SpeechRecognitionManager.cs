@@ -70,7 +70,7 @@ namespace DSN {
                 for (; ; ) {
                     try {
                         this.DSN.SetInputToDefaultAudioDevice();
-                        Trace.TraceInformation("The recording device is ready.");
+                        Trace.TraceInformation("The recording device is ready, recognition started.");
                         break;
                     } catch (System.InvalidOperationException) {
                         if (!logWaitingRecDev) {

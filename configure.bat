@@ -35,10 +35,12 @@ if defined SkyrimSEInstallPath (
 )
 echo CMakeFlags:!CMakeFlags!
 
-:: disable Prefer32Bit for C# project
-SET Prefer32Bit=false
-
 cmake -A x64 !CMakeFlags! ..
+
+:: disable Prefer32Bit for C# project
+cd dsn_service
+type ..\..\dsn_service\disable_prefer_32bit.ps1 | powershell.exe -Command -
+cd ..
 
 :: load project
 start DSN.sln

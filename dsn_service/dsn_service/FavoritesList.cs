@@ -111,8 +111,6 @@ namespace DSN {
            
             dynamic itemNameMap = LoadItemNameMap();
 
-            Trace.TraceInformation("Received favorites list: {0}", input);
-
             string equipPrefix = config.Get("Favorites", "equipPhrasePrefix", "equip");
             commandsByGrammar.Clear();
             string[] itemTokens = input.Split('|');

@@ -85,6 +85,9 @@ namespace DSN {
 
         private void ListenForInput() {
             try {
+                // try to restore saved state after reloading the configuration file.
+                consoleInput.RestoreSavedState();
+
                 while (true) {
                     string input = consoleInput.ReadLine();
 
@@ -98,18 +101,21 @@ namespace DSN {
                     string[] tokens = input.Split('|');
                     string command = tokens[0];
                     if (command.Equals("START_DIALOGUE")) {
+                        consoleInput.currentDialogue = input;
                         lock (dialogueLock) {
                             currentDialogue = DialogueList.Parse(string.Join("|", tokens, 1, tokens.Length - 1), config);
                         }
                         // Switch to dialogue mode
                         recognizer.StartSpeechRecognition(true, currentDialogue);
                     } else if (command.Equals("STOP_DIALOGUE")) {
+                        consoleInput.currentDialogue = null;
                         // Switch to command mode
                         recognizer.StartSpeechRecognition(false, config.GetConsoleCommandList(), favoritesList);
                         lock (dialogueLock) {
                             currentDialogue = null;
                         }
                     } else if (command.Equals("FAVORITES")) {
+                        consoleInput.currentFavoritesList = input;
                         favoritesList.Update(string.Join("|", tokens, 1, tokens.Length - 1));
                         if(currentDialogue == null) {
                             recognizer.StartSpeechRecognition(false, config.GetConsoleCommandList(), favoritesList);

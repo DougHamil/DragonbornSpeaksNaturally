@@ -101,8 +101,11 @@ namespace DSN {
                 if (filename.Equals(configFileName))
                 {
                     Trace.TraceInformation("Config file {0} changed", filename);
-                    isConfigFileChanged = true;
 
+                    // Wait for the configuration file to be saved
+                    Thread.Sleep(1000);
+
+                    isConfigFileChanged = true;
                     Stop();
                     skyrimInterop.Stop();
                 }

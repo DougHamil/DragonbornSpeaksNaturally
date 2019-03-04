@@ -17,6 +17,10 @@ namespace DSN
         private Thread inputThread = null;
         bool isInputTerminated = false;
 
+        // Saved state, used to restore after reloading the configuration file.
+        public string currentDialogue = null;
+        public string currentFavoritesList = null;
+
         public void Start()
         {
             inputThread = new Thread(ReadLineFromConsole);
@@ -55,6 +59,15 @@ namespace DSN
 
         public string ReadLine() {
             return inputQueue.Take();
+        }
+
+        public void RestoreSavedState() {
+            if (currentFavoritesList != null) {
+                inputQueue.Add(currentFavoritesList);
+            }
+            if (currentDialogue != null) {
+                inputQueue.Add(currentDialogue);
+            }
         }
     }
 }

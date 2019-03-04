@@ -66,8 +66,7 @@ namespace DSN {
         public CommandList GetConsoleCommandList() {
             if (consoleCommandList == null) {
                 consoleCommandList = CommandList.FromIniSection(merged, "ConsoleCommands");
-
-                Trace.TraceInformation("Loaded Console Commands:");
+                
                 consoleCommandList.PrintToTrace();
             }
 

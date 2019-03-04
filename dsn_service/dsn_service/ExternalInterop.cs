@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 namespace DSN {
     class ExternalInterop {
 
-        Configuration config = null;
-        SkyrimInterop skyrimInterop = null;
+        private Configuration config = null;
+        private SkyrimInterop skyrimInterop = null;
 
         private readonly HashSet<string> BATCH_FILENAMES = new HashSet<string>() { "wotv", "ivrqs" };
         private readonly long FILE_CHANGE_DEBOUNCE_TIME_TICKS = 10000 * 200; // 200 ms

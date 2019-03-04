@@ -50,6 +50,7 @@ namespace DSN {
             if (waitingDeviceThread != null) {
                 waitingDeviceThread.Abort();
             }
+            StopRecognition();
         }
 
         private void WaitRecordingDeviceNonBlocking() {

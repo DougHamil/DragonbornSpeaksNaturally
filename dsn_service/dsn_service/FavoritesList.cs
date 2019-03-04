@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -11,7 +11,7 @@ using System.IO;
 namespace DSN {
     class FavoritesList : ISpeechRecognitionGrammarProvider {
 
-        Configuration config;
+        private Configuration config;
         private Dictionary<Grammar, string> commandsByGrammar;
         private string leftHandSuffix;
         private string rightHandSuffix;

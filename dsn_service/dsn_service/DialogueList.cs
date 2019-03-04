@@ -9,7 +9,7 @@ namespace DSN {
 
         private static readonly SubsetMatchingMode DEFAULT_GRAMMAR_MATCHING_MODE = SubsetMatchingMode.OrderedSubsetContentRequired;
 
-        Configuration config;
+        private Configuration config;
 
         public static DialogueList Parse(string input, Configuration config) {
             string[] tokens = input.Split('|');

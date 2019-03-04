@@ -154,29 +154,53 @@ namespace DSN {
         }
 
         public string GetCommandForResult(RecognitionResult result) {
-            var handednessMap = new Dictionary<string, string>
+            var mainHandMap = new Dictionary<string, string>
             {
                 { bothHandsSuffix, "0" },
                 { rightHandSuffix, "1" },
                 { leftHandSuffix, "2" },
+
+                // Comment of `mainHand` in `DragonbornSpeaksNaturally.SAMPLE.ini` said:
+                // > Valid values are "right", "left", "both"
+                // We should keep the compatibility to prevent user confusion.
+                { "both", "0" },
+                { "right", "1" },
+                { "left", "2" },
             };
 
             Grammar grammar = result.Grammar;
             if (commandsByGrammar.ContainsKey(grammar)) {
                 string command = commandsByGrammar[grammar];
-                string lastToken = result.Text.Split(' ').Last();
 
-                // Did the user ask to put the item in a specific hand?
-                if(handednessMap.ContainsKey(lastToken)) {
-                    command += handednessMap[lastToken];
-                } else if (handednessMap.ContainsKey(mainHand)) { 
+                // Determine handedness
+                //
+                // NOTICE: Some languages (such as Chinese) do not use spaces to separate words.
+                // So the code such as `result.Text.Split(' ').Last()` will not work for them.
+                // Be aware of this when changing the code below.
+                //
+                if (result.Text.EndsWith(bothHandsSuffix))
+                {
+                    command += "0";
+                }
+                else if(result.Text.EndsWith(rightHandSuffix))
+                {
+                    command += "1";
+                }
+                else if (result.Text.EndsWith(leftHandSuffix))
+                {
+                    command += "2";
+                }
+                else if (mainHandMap.ContainsKey(mainHand))
+                {
                     // The user didn't ask for a specific hand, supply a user specified default
-                    command += handednessMap[mainHand];
-                } else {
+                    command += mainHandMap[mainHand];
+                }
+                else
+                {
                     // Try equipping the item in both hands as a last resort
                     command += "0";
                 }
-                
+
                 return command;
             }
 

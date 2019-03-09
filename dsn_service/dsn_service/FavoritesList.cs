@@ -11,11 +11,57 @@ using System.IO;
 namespace DSN {
     class FavoritesList : ISpeechRecognitionGrammarProvider {
 
-        private  Dictionary<Grammar, string> commandsByGrammar = new Dictionary<Grammar, string>();
-        private string leftHandSuffix = Configuration.Get("Favorites", "equipLeftSuffix", "left");
-        private string rightHandSuffix = Configuration.Get("Favorites", "equipRightSuffix", "right");
-        private string bothHandsSuffix = Configuration.Get("Favorites", "equipBothSuffix", "both");
-        private string mainHand = Configuration.Get("Favorites", "mainHand", "none");
+        private Configuration config;
+        private Dictionary<Grammar, string> commandsByGrammar;
+
+        private bool enabled;
+        private bool useEquipHandPrefix;
+
+        private string leftHandSuffix;
+        private string rightHandSuffix;
+        private string bothHandsSuffix;
+
+        private string mainHand;
+        private string mainHandId;
+
+        public FavoritesList(Configuration config) {
+            this.config = config;
+            commandsByGrammar = new Dictionary<Grammar, string>();
+
+            enabled = config.Get("Favorites", "enabled", "1") == "1";
+            useEquipHandPrefix = config.Get("Favorites", "useEquipHandPrefix", "0") == "1";
+
+            leftHandSuffix = config.Get("Favorites", "equipLeftSuffix", "left");
+            rightHandSuffix = config.Get("Favorites", "equipRightSuffix", "right");
+            bothHandsSuffix = config.Get("Favorites", "equipBothSuffix", "both");
+            
+            mainHand = config.Get("Favorites", "mainHand", "none");
+
+            // Determine the main hand used when user didn't ask for a specific hand.
+            // 
+            // If an initializer is used and the key name conflicts (such as bothHandsSuffix == "both"),
+            // an System.ArgumentException will be thrown. So assigning values one by one is a safer way.
+            var mainHandMap = new Dictionary<string, string>();
+            mainHandMap[bothHandsSuffix] = "0";
+            mainHandMap[rightHandSuffix] = "1";
+            mainHandMap[leftHandSuffix] = "2";
+
+            // Comment of `mainHand` in `DragonbornSpeaksNaturally.SAMPLE.ini` said:
+            // > Valid values are "right", "left", "both"
+            // We should keep the compatibility to prevent user confusion.
+            mainHandMap["both"] = "0";
+            mainHandMap["right"] = "1";
+            mainHandMap["left"] = "2";
+
+            if (mainHandMap.ContainsKey(mainHand))
+            {
+                mainHandId = mainHandMap[mainHand];
+            }
+            else {
+                // User does not specify the main hand. Equipped with both hands by default.
+                mainHandId = "0";
+            }
+        }
 
         private HashSet<string> knownEquipmentTypes = new HashSet<string>
         {
@@ -40,13 +86,23 @@ namespace DSN {
 
         public void BuildAndAddGrammar(string phrase, string command, bool isSingleHanded)
         {
-            GrammarBuilder grammarBuilder = new GrammarBuilder(phrase);
+            Choices handChoice = new Choices(new string[] { bothHandsSuffix, leftHandSuffix, rightHandSuffix });
+            GrammarBuilder grammarBuilder = new GrammarBuilder();
 
-            // Append hand choice if necessary
-            if (isSingleHanded)
+            // Append hand choice prefix
+            if (isSingleHanded && useEquipHandPrefix)
             {
-                Choices handChoice = new Choices(new string[] { bothHandsSuffix, leftHandSuffix, rightHandSuffix });
-                grammarBuilder.Append(handChoice, 0, 1); // Optional left/right. When excluded, try to equip to both hands
+                // Optional left/right. When excluded, try to equip to both hands
+                grammarBuilder.Append(handChoice, 0, 1);
+            }
+
+            grammarBuilder.Append(phrase);
+
+            // Append hand choice suffix
+            if (isSingleHanded && !useEquipHandPrefix)
+            {
+                // Optional left/right. When excluded, try to equip to both hands
+                grammarBuilder.Append(handChoice, 0, 1);
             }
 
             Grammar grammar = new Grammar(grammarBuilder);
@@ -58,7 +114,7 @@ namespace DSN {
         // Returns dynamic map/dictionary or null when the replacement map files cannot be located
         public dynamic LoadItemNameMap()
         {
-            string filepath = Configuration.resolveFilePath("item-name-map.json");
+            string filepath = config.resolveFilePath("item-name-map.json");
             if(File.Exists(filepath))
             {
                 return LoadItemNameMap(filepath);
@@ -92,7 +148,7 @@ namespace DSN {
  
 
         public void Update(string input) {
-            if(Configuration.Get("Favorites", "enabled", "1") == "0") {
+            if(!enabled) {
                 return;
             }
 
@@ -100,9 +156,7 @@ namespace DSN {
            
             dynamic itemNameMap = LoadItemNameMap();
 
-            Trace.TraceInformation("Received favorites list: {0}", input);
-
-            string equipPrefix = Configuration.Get("Favorites", "equipPhrasePrefix", "equip");
+            string equipPrefix = config.Get("Favorites", "equipPhrasePrefix", "equip");
             commandsByGrammar.Clear();
             string[] itemTokens = input.Split('|');
             foreach(string itemStr in itemTokens) {
@@ -144,30 +198,44 @@ namespace DSN {
             }
         }
 
-        public string GetCommandForResult(RecognitionResult result) {
-            var handednessMap = new Dictionary<string, string>
-            {
-                { bothHandsSuffix, "0" },
-                { rightHandSuffix, "1" },
-                { leftHandSuffix, "2" },
-            };
+        private bool hasPrefixOrSuffix(string text, string prefixOrSuffix) {
+            //
+            // NOTICE: Some languages (such as Chinese) do not use spaces to separate words.
+            // So the code such as `result.Text.Split(' ').Last()` will not work for them.
+            // Be aware of this when changing the code below.
+            //
+            return useEquipHandPrefix ? text.StartsWith(prefixOrSuffix) : text.EndsWith(prefixOrSuffix);
+        }
 
+        public string GetCommandForResult(RecognitionResult result) {
             Grammar grammar = result.Grammar;
             if (commandsByGrammar.ContainsKey(grammar)) {
                 string command = commandsByGrammar[grammar];
-                string lastToken = result.Text.Split(' ').Last();
 
-                // Did the user ask to put the item in a specific hand?
-                if(handednessMap.ContainsKey(lastToken)) {
-                    command += handednessMap[lastToken];
-                } else if (handednessMap.ContainsKey(mainHand)) { 
-                    // The user didn't ask for a specific hand, supply a user specified default
-                    command += handednessMap[mainHand];
-                } else {
-                    // Try equipping the item in both hands as a last resort
+                // Determine handedness
+                //
+                // NOTICE: Some languages (such as Chinese) do not use spaces to separate words.
+                // So the code such as `result.Text.Split(' ').Last()` will not work for them.
+                // Be aware of this when changing the code below.
+                //
+                if (hasPrefixOrSuffix(result.Text, bothHandsSuffix))
+                {
                     command += "0";
                 }
-                
+                else if(hasPrefixOrSuffix(result.Text, rightHandSuffix))
+                {
+                    command += "1";
+                }
+                else if (hasPrefixOrSuffix(result.Text, leftHandSuffix))
+                {
+                    command += "2";
+                }
+                else
+                {
+                    // The user didn't ask for a specific hand, supply a default
+                    command += mainHandId;
+                }
+
                 return command;
             }
 

@@ -11,92 +11,90 @@ using System.Threading.Tasks;
 namespace DSN {
 
     class Configuration {
-        private static readonly string CONFIG_FILE_NAME = "DragonbornSpeaksNaturally.ini";
-        private static readonly string COMMAND_FILE_NAME = "DragonbornSpeaksNaturally.ini";
+        private readonly string CONFIG_FILE_NAME = "DragonbornSpeaksNaturally.ini";
 
         // NOTE: Relative to SkyrimVR.exe
-        private static readonly string[] SEARCH_DIRECTORIES = {
+        private readonly string[] SEARCH_DIRECTORIES = {
             "Data\\Plugins\\Sumwunn\\",
             ""
         };
 
-        private static IniData global = null;
-        private static IniData local = null;
-        private static IniData merged = null;
-        private static CommandList consoleCommandList = null;
+        private string iniFilePath = null;
 
-        private Configuration() { }
+        private IniData global = null;
+        private IniData local = null;
+        private IniData merged = null;
+        private List<string> goodbyePhrases = null;
+        private CommandList consoleCommandList = null;
 
-        public static string Get(string section, string key, string def) {
-            string val = getData()[section][key];
+        public Configuration() {
+            iniFilePath = resolveFilePath(CONFIG_FILE_NAME);
+
+            loadLocal();
+            loadGlobal();
+
+            merged = new IniData();
+            merged.Merge(global);
+            merged.Merge(local);
+        }
+
+        public string GetIniFilePath() {
+            return iniFilePath;
+        }
+
+        public string Get(string section, string key, string def) {
+            string val = merged[section][key];
             if (val == null)
                 return def;
             return val;
         }
 
-        public static List<string> GetGoodbyePhrases() {
-            string phrases = merged["Dialogue"]["goodbyePhrases"];
-            if(phrases != null) {
-                List<string> list = new List<string>(phrases.Split(';'));
-                list.RemoveAll((str) => str == null || str.Trim() == "");
-                return list;
+        public List<string> GetGoodbyePhrases() {
+            if (goodbyePhrases == null) {
+                goodbyePhrases = new List<string>();
+
+                string phrases = merged["Dialogue"]["goodbyePhrases"];
+                if (phrases != null) {
+                    goodbyePhrases.AddRange(phrases.Split(';'));
+                    goodbyePhrases.RemoveAll((str) => str == null || str.Trim() == "");
+                }
             }
-            return new List<string>();
+
+            return goodbyePhrases;
         }
 
-        public static CommandList GetConsoleCommandList() {
-            if(consoleCommandList != null)
-                return consoleCommandList;
-
-            IniData commandData = loadIniFromFilename(COMMAND_FILE_NAME);
-            if(commandData != null) {
-                consoleCommandList = CommandList.FromIniSection(commandData, "ConsoleCommands");
-            } else {
-                consoleCommandList = new CommandList();
+        public CommandList GetConsoleCommandList() {
+            if (consoleCommandList == null) {
+                consoleCommandList = CommandList.FromIniSection(merged, "ConsoleCommands");
+                
+                consoleCommandList.PrintToTrace();
             }
-
-            Trace.TraceInformation("Loaded Console Commands:");
-            consoleCommandList.PrintToTrace();
 
             return consoleCommandList;
         }
 
-        private static IniData getData() {
-            if (merged == null) {
-                loadLocal();
-                loadGlobal();
-                merged = new IniData();
-                merged.Merge(global);
-                merged.Merge(local);
-            }
-
-            return merged;
-        }
-
-        private static void loadGlobal() {
+        private void loadGlobal() {
             global = new IniData();
             // global["SpeechRecognition"]["Locale"] = "en-US";
         }
 
-        private static void loadLocal() {
-
-            local = loadIniFromFilename(CONFIG_FILE_NAME);
+        private void loadLocal() {
+            local = loadIniFromFilePath(iniFilePath);
             if (local == null)
                 local = new IniData();
         }
 
-        public static string resolveFilePath(string filename) {
+        public string resolveFilePath(string filename) {
             foreach (string directory in SEARCH_DIRECTORIES) {
                 string filepath = directory + filename;
                 if (File.Exists(filepath)) {
-                    return filepath;
+                    return Path.GetFullPath(filepath); ;
                 }
             }
             return null;
         }
 
-        private static IniData loadIniFromFilename(string filename) {
-            string filepath = resolveFilePath(filename);
+        private IniData loadIniFromFilePath(string filepath) {
             if (filepath != null) {
                 Trace.TraceInformation("Loading ini from path " + filepath);
                 try {

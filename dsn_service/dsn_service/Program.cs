@@ -27,16 +27,34 @@ namespace DSN {
                     }
                 }
 
-                Thread skyrimThread = SkyrimInterop.Start();
-                Thread externalThread = ExternalInterop.Start();
+                // Thread.Abort() cannot abort the calling of Console.ReadLine().
+                // So the call is in a separate thread that does not need to be restarted
+                // after reloading the configuration file.
+                ConsoleInput consoleInput = new ConsoleInput();
+                consoleInput.Start();
 
-                // Skyrim thread will finish when Skyrim closes
-                skyrimThread.Join();
+                bool reloadConfigFile = true;
+                while (reloadConfigFile)
+                {
+                    Configuration config = new Configuration();
+                    SkyrimInterop skyrimInterop = new SkyrimInterop(config, consoleInput);
+                    ExternalInterop externalInterop = new ExternalInterop(config, skyrimInterop);
 
-                // Cleanup threads
-                SkyrimInterop.Stop();
-                ExternalInterop.Stop();
-                externalThread.Abort();
+                    skyrimInterop.Start();
+                    externalInterop.Start();
+
+                    // skyrimThread will terminate when Skyrim terminated (stdin closed) or config file updated
+                    skyrimInterop.Join();
+
+                    reloadConfigFile = externalInterop.IsConfigFileChanged();
+
+                    if (!reloadConfigFile)
+                    {
+                        // Cleanup threads
+                        externalInterop.Stop();
+                        skyrimInterop.Stop();
+                    }
+                }
 
             } catch (Exception ex) {
                 Trace.TraceError(ex.ToString());

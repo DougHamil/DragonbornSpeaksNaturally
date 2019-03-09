@@ -11,43 +11,56 @@ using System.Threading.Tasks;
 namespace DSN {
     class SkyrimInterop {
 
-        private static System.Object dialogueLock = new System.Object();
-        private static DialogueList currentDialogue = null;
-        private static FavoritesList favoritesList = null;
-        private static SpeechRecognitionManager recognizer;
-        private static Thread submissionThread;
-        private static BlockingCollection<string> commandQueue;
+        private Configuration config = null;
+        private ConsoleInput consoleInput = null;
 
-        public static Thread Start() {
+        private System.Object dialogueLock = new System.Object();
+        private DialogueList currentDialogue = null;
+        private FavoritesList favoritesList = null;
+        private SpeechRecognitionManager recognizer;
+        private Thread submissionThread;
+        private Thread listenThread;
+        private BlockingCollection<string> commandQueue;
+
+        public SkyrimInterop(Configuration config, ConsoleInput consoleInput) {
+            this.config = config;
+            this.consoleInput = consoleInput;
+        }
+
+        public void Start() {
             try {
-                favoritesList = new FavoritesList();
+                favoritesList = new FavoritesList(config);
                 commandQueue = new BlockingCollection<string>();
-                recognizer = new SpeechRecognitionManager();
+                recognizer = new SpeechRecognitionManager(config);
                 recognizer.OnDialogueLineRecognized += Recognizer_OnDialogueLineRecognized;
 
                 // Start in command-mode
-                recognizer.StartSpeechRecognition(false, Configuration.GetConsoleCommandList(), favoritesList);
+                recognizer.StartSpeechRecognition(false, config.GetConsoleCommandList(), favoritesList);
 
-                Thread listenThread = new Thread(ListenForInput);
+                listenThread = new Thread(ListenForInput);
                 submissionThread = new Thread(SubmitCommands);
                 submissionThread.Start();
                 listenThread.Start();
-                return listenThread;
             }
             catch (Exception ex) {
                 Trace.TraceError("Failed to initialize speech recognition due to error:");
                 Trace.TraceError(ex.ToString());
             }
-
-            return null;
         }
 
-        public static void Stop() {
-            submissionThread.Abort();
+        public void Join() {
+            listenThread.Join();
+        }
+
+        public void Stop() {
+            // Notify threads to exit
+            consoleInput.WriteLine(null);
+            commandQueue.Add(null);
+            
             recognizer.Stop();
         }
 
-        public static void SubmitCommand(string command) {
+        public void SubmitCommand(string command) {
             commandQueue.Add(sanitize(command));
         }
 
@@ -56,22 +69,30 @@ namespace DSN {
             return command.Replace("\r", "");
         }
 
-        private static void SubmitCommands() {
+        private void SubmitCommands() {
             while(true) {
                 string command = commandQueue.Take();
+
+                // Thread exit signal
+                if (command == null) {
+                    break;
+                }
+
                 Trace.TraceInformation("Sending command: {0}", command);
                 Console.Write(command+"\n");
             }
         }
 
-        private static void ListenForInput() {
+        private void ListenForInput() {
             try {
-                while (true) {
-                    string input = Console.ReadLine();
+                // try to restore saved state after reloading the configuration file.
+                consoleInput.RestoreSavedState();
 
-                    // input will be null when Skyrim is terminated
+                while (true) {
+                    string input = consoleInput.ReadLine();
+
+                    // input will be null when Skyrim terminated (stdin closed)
                     if (input == null) {
-                        Trace.TraceInformation("Skyrim is terminated, recognition service will quit.");
                         break;
                     }
 
@@ -80,21 +101,24 @@ namespace DSN {
                     string[] tokens = input.Split('|');
                     string command = tokens[0];
                     if (command.Equals("START_DIALOGUE")) {
+                        consoleInput.currentDialogue = input;
                         lock (dialogueLock) {
-                            currentDialogue = DialogueList.Parse(string.Join("|", tokens, 1, tokens.Length - 1));
+                            currentDialogue = DialogueList.Parse(string.Join("|", tokens, 1, tokens.Length - 1), config);
                         }
                         // Switch to dialogue mode
                         recognizer.StartSpeechRecognition(true, currentDialogue);
                     } else if (command.Equals("STOP_DIALOGUE")) {
+                        consoleInput.currentDialogue = null;
                         // Switch to command mode
-                        recognizer.StartSpeechRecognition(false, Configuration.GetConsoleCommandList(), favoritesList);
+                        recognizer.StartSpeechRecognition(false, config.GetConsoleCommandList(), favoritesList);
                         lock (dialogueLock) {
                             currentDialogue = null;
                         }
                     } else if (command.Equals("FAVORITES")) {
+                        consoleInput.currentFavoritesList = input;
                         favoritesList.Update(string.Join("|", tokens, 1, tokens.Length - 1));
                         if(currentDialogue == null) {
-                            recognizer.StartSpeechRecognition(false, Configuration.GetConsoleCommandList(), favoritesList);
+                            recognizer.StartSpeechRecognition(false, config.GetConsoleCommandList(), favoritesList);
                         }
                     }
                 }
@@ -103,7 +127,7 @@ namespace DSN {
             }
         }
 
-        private static void Recognizer_OnDialogueLineRecognized(RecognitionResult result) {
+        private void Recognizer_OnDialogueLineRecognized(RecognitionResult result) {
             string line = result.Text;
 
             lock (dialogueLock) {
@@ -116,7 +140,7 @@ namespace DSN {
                     if(command != null) {
                         SubmitCommand("EQUIP|" + command);
                     } else {
-                        command = Configuration.GetConsoleCommandList().GetCommandForPhrase(result.Grammar);
+                        command = config.GetConsoleCommandList().GetCommandForPhrase(result.Grammar);
                         if (command != null) {
                             SubmitCommand("COMMAND|" + command);
                         }
